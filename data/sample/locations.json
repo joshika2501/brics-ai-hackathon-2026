@@ -1,0 +1,23 @@
+{
+  "India": [
+    {
+      "city": "Delhi",
+      "latitude": 28.6139,
+      "longitude": 77.2090
+    }
+  ],
+  "Brazil": [
+    {
+      "city": "Sao Paulo",
+      "latitude": -23.5505,
+      "longitude": -46.6333
+    }
+  ],
+  "South Africa": [
+    {
+      "city": "Johannesburg",
+      "latitude": -26.2041,
+      "longitude": 28.0473
+    }
+  ]
+}

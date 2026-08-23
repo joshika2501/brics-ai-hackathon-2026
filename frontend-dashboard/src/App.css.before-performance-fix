@@ -1,0 +1,2083 @@
+:root{
+  --bg:#07131b;--bg2:#0b1923;--card:#101e29;--card2:#142431;--border:#223542;
+  --text:#e7f0f5;--muted:#8396a3;--cyan:#25d3d8;--cyan2:#18aeb8;--orange:#ff7131;
+  --yellow:#f4b52b;--red:#ff5b4d;--green:#39d49b;--purple:#9a7cff;
+}
+:root[data-theme="light"]{
+  --bg:#eef4f6;--bg2:#f7fafb;--card:#ffffff;--card2:#f3f8fa;--border:#d7e2e7;
+  --text:#13232d;--muted:#657984;--cyan:#0bb6c0;--cyan2:#078d98;--orange:#e85d23;
+  --yellow:#d89400;--red:#dc4437;--green:#149a6d;--purple:#7659d8;
+}
+*{box-sizing:border-box}html,body,#root{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+body{min-width:320px}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app-shell{min-height:100vh;background:radial-gradient(circle at 85% 18%,rgba(37,211,216,.06),transparent 30%),radial-gradient(circle at 10% 80%,rgba(89,80,255,.05),transparent 35%),var(--bg)}
+.main-shell{min-height:100vh;margin-left:248px}.sidebar{position:fixed;z-index:30;left:0;top:0;bottom:0;width:248px;background:rgba(7,18,25,.94);border-right:1px solid var(--border);padding:24px 14px;display:flex;flex-direction:column;backdrop-filter:blur(18px)}
+:root[data-theme="light"] .sidebar{background:rgba(255,255,255,.94)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:5px 9px 28px}.sidebar-brand>div:nth-child(2){display:flex;flex-direction:column}.sidebar-brand b{font-size:17px}.sidebar-brand span{font-size:10px;color:var(--muted);margin-top:3px}.logo-placeholder,.brand-icon,.brand-mark{display:grid;place-items:center;border:1px solid rgba(37,211,216,.5);color:var(--cyan);background:rgba(37,211,216,.07);box-shadow:0 0 28px rgba(37,211,216,.08)}.logo-placeholder{width:43px;height:43px;border-radius:14px}.sidebar nav{display:flex;flex-direction:column;gap:5px}.nav-item{width:100%;display:flex;align-items:center;gap:12px;padding:12px 13px;border:0;border-radius:11px;background:transparent;color:var(--muted);text-align:left}.nav-item:hover{background:rgba(37,211,216,.06);color:var(--text)}.nav-item.active{background:rgba(37,211,216,.11);color:var(--cyan);border:1px solid rgba(37,211,216,.18)}.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:5px}.mobile-close,.menu-button,.sidebar-overlay{display:none}
+.topbar{height:92px;display:flex;align-items:center;justify-content:space-between;padding:18px 34px;border-bottom:1px solid var(--border);background:rgba(7,19,27,.72);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:14px}.brand-icon{width:51px;height:51px;border-radius:16px;position:relative}.live-dot{position:absolute;right:-2px;top:-2px;width:11px;height:11px;border-radius:50%;background:var(--green);box-shadow:0 0 15px var(--green)}.brand h1{margin:0;font-size:25px;letter-spacing:-.7px}.brand h1 span{color:#7de1e4}.brand p{margin:5px 0 0;color:var(--muted);font-size:13px}.header-actions{display:flex;align-items:center;gap:8px}.connection,.city-select,.icon-button,.language-select,.refresh-button{height:42px;border:1px solid var(--border);border-radius:11px;background:rgba(16,30,41,.75);color:var(--text);display:flex;align-items:center;gap:8px}.connection{padding:0 12px;font-size:12px;font-weight:700;letter-spacing:.08em}.connection.online{color:var(--green);border-color:rgba(57,212,155,.3)}.connection.offline{color:var(--muted)}.status-dot{width:8px;height:8px;border-radius:50%;background:currentColor}.city-select{padding:0 9px}.city-select select,.language-select{border:0;outline:0;background:transparent;color:inherit}.city-select select{appearance:none;padding:0 2px}.city-select option,.language-select option{background:var(--card);color:var(--text)}.icon-button,.language-select{width:42px;justify-content:center}.refresh-button{padding:0 13px;font-weight:700}.refresh-button:disabled{opacity:.6}.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.dashboard{max-width:1360px;margin:0 auto;padding:30px 34px 55px}.hero-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;margin-bottom:24px}.hero-intro h2{font-size:31px;margin:7px 0 7px;letter-spacing:-1px}.hero-intro p{margin:0;color:var(--muted)}.eyebrow{font-size:10px;letter-spacing:.18em;color:#8296a3;font-weight:800}.flow-strip{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}.flow-strip svg{color:#536773}.flow-strip b{color:var(--cyan);font-size:15px}
+.glass-card{background:linear-gradient(145deg,rgba(19,34,46,.96),rgba(12,25,34,.96));border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.12)}:root[data-theme="light"] .glass-card{background:linear-gradient(145deg,#fff,#f6fafb);box-shadow:0 12px 35px rgba(23,51,65,.07)}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}.metric-card{padding:25px 26px;min-height:178px;border-top:2px solid var(--cyan)}.metric-card.risk-moderate{border-top-color:var(--yellow)}.metric-card.risk-high,.metric-card.risk-critical{border-top-color:var(--orange)}.metric-card.risk-low{border-top-color:var(--green)}.metric-top,.card-title{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.metric-icon,.title-icon{color:var(--cyan)}.metric-value{font-size:42px;font-weight:800;letter-spacing:-1.8px;margin-top:25px}.metric-value small{font-size:14px;color:var(--muted);font-weight:600;letter-spacing:0}.metric-sub{margin-top:10px;color:var(--muted);font-size:13px}.accent-orange{color:var(--orange)}.status-pill{display:inline-flex;border:1px solid rgba(244,181,43,.3);color:var(--yellow);border-radius:999px;padding:4px 9px;font-size:11px}.wind-symbol{font-size:29px}.dashboard-grid{display:grid;grid-template-columns:1.65fr 1fr;gap:16px;margin-bottom:16px}.dashboard-grid.three{grid-template-columns:repeat(3,1fr)}.chart-card,.intelligence-card{padding:24px}.chart-wrap{height:270px;margin-top:15px}.card-title h3{margin:5px 0 0;font-size:17px}.intelligence-card h3{font-size:20px;line-height:1.35;margin:20px 0 9px}.intelligence-card>p{color:var(--muted);line-height:1.65;font-size:13px}.ai-badge{display:inline-block;margin-top:16px;padding:5px 8px;border-radius:6px;font-size:9px;letter-spacing:.12em;font-weight:800}.ai-badge.generated{color:var(--green);background:rgba(57,212,155,.08)}.ai-badge.fallback{color:var(--yellow);background:rgba(244,181,43,.08)}.why-box{margin-top:20px;padding:14px;border:1px solid var(--border);border-radius:12px;background:rgba(37,211,216,.025)}.why-box span{font-size:9px;letter-spacing:.15em;color:var(--cyan);font-weight:800}.why-box p{margin:7px 0 0!important}.driver-list{margin-top:18px}.driver-row{margin-bottom:15px}.driver-row>div:first-child{display:flex;justify-content:space-between;gap:10px;font-size:12px}.positive{color:var(--orange)}.negative{color:#7fa6ff}.driver-track{height:4px;background:var(--border);border-radius:99px;margin-top:7px;overflow:hidden}.driver-track i{display:block;height:100%;background:var(--cyan);border-radius:inherit}.priority-box{margin:18px 0;padding:14px;border-radius:12px;background:rgba(255,113,49,.06);border:1px solid rgba(255,113,49,.18);display:flex;justify-content:space-between;align-items:center}.priority-box span{font-size:9px;letter-spacing:.15em;color:var(--muted)}.priority-box strong{color:var(--orange)}.action-list{display:flex;flex-direction:column;gap:11px}.action-row{display:flex;gap:9px;color:var(--muted);font-size:12px;line-height:1.45}.action-row svg{color:var(--green);flex:0 0 auto}.hotspot-mini{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}.hotspot-mini:last-child{border-bottom:0}.hotspot-mini div{display:flex;flex-direction:column;gap:4px}.hotspot-mini b{font-size:12px}.hotspot-mini span{font-size:10px;color:var(--muted)}.hotspot-mini strong{color:var(--orange)}.brics-context{padding:24px;margin-top:0}.context-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:14px;margin:20px 0}.context-grid div{display:flex;flex-direction:column;gap:6px}.context-grid span{font-size:9px;letter-spacing:.14em;color:var(--muted)}.context-grid b{font-size:13px}.brics-context small{color:var(--muted)}
+.error-banner{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid rgba(255,91,77,.35);background:rgba(255,91,77,.06);border-radius:12px;margin-bottom:16px;color:#ff9b91}.error-banner span{flex:1;font-size:13px}.error-banner button{border:1px solid rgba(255,91,77,.35);background:transparent;color:inherit;border-radius:8px;padding:7px 12px}
+.footer{max-width:1360px;margin:auto;padding:0 34px 28px;display:flex;justify-content:center;gap:10px;color:#667984;font-size:10px;letter-spacing:.05em}
+.page-card{padding:28px;min-height:500px}.page-description{color:var(--muted);max-width:800px;line-height:1.6;font-size:13px}.map-placeholder{height:390px;margin-top:22px;border-radius:16px;border:1px solid var(--border);overflow:hidden;background:radial-gradient(circle at 55% 45%,rgba(37,211,216,.12),transparent 23%),linear-gradient(135deg,#0e202c,#09151d)}.map-grid{height:100%;position:relative;background-image:linear-gradient(rgba(110,150,160,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(110,150,160,.08) 1px,transparent 1px);background-size:42px 42px}.map-pin{position:absolute;font-size:25px;filter:drop-shadow(0 0 9px rgba(255,100,70,.4))}.p1{left:34%;top:28%}.p2{left:56%;top:45%}.p3{left:69%;top:30%}.p4{left:45%;top:65%}.map-label{position:absolute;left:18px;bottom:15px;color:#7e96a2;font-size:10px;letter-spacing:.15em}.hotspot-page-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.hotspot-card{padding:18px;border-radius:14px;border:1px solid var(--border);background:var(--card2);display:flex;flex-direction:column;gap:8px}.hotspot-card h3{margin:2px 0 8px;font-size:15px}.hotspot-card>strong{font-size:30px}.hotspot-card>strong small{font-size:11px;color:var(--muted)}.hotspot-card>span:last-child{font-size:10px;color:var(--muted)}.industry-list{display:flex;flex-direction:column;gap:10px;margin-top:20px}.industry-card{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--card2)}.industry-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:12px;color:var(--cyan);background:rgba(37,211,216,.08)}.industry-main{flex:1}.industry-main h3{margin:0 0 5px;font-size:14px}.industry-main>span{font-size:11px;color:var(--muted)}.industry-status{display:flex;gap:12px;margin-top:10px;font-size:10px}.industry-status b{color:var(--yellow)}.industry-status span{color:var(--green)}.report-form{max-width:700px;display:flex;flex-direction:column;gap:12px;margin-top:20px}.report-form input,.report-form select,.report-form textarea,.chat-input input,.settings-row select,.login-card input{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:10px;padding:12px 13px;outline:none}.report-form textarea{resize:vertical}.primary-button,.secondary-button,.upload-button{border-radius:10px;padding:11px 15px;display:flex;align-items:center;justify-content:center;gap:8px}.primary-button{background:var(--cyan);border:1px solid var(--cyan);color:#052026;font-weight:800}.secondary-button,.upload-button{background:transparent;border:1px solid var(--border);color:var(--text)}.success-panel{padding:50px;text-align:center;border:1px solid rgba(57,212,155,.25);background:rgba(57,212,155,.05);border-radius:16px;margin-top:20px}.success-panel svg{color:var(--green)}.sensor-banner{margin-top:20px;display:flex;gap:10px;align-items:center;padding:13px;border:1px dashed rgba(244,181,43,.35);border-radius:11px;color:var(--muted);font-size:11px}.sensor-banner b{color:var(--yellow);letter-spacing:.08em}.online-dot{color:var(--green);background:var(--green)}.sensor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}.sensor-card{padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--card2)}.sensor-card>span{font-size:10px;color:var(--muted)}.sensor-card strong{display:block;font-size:28px;margin:14px 0}.sensor-card strong small{font-size:10px;color:var(--muted)}.sensor-status{font-size:9px;letter-spacing:.12em}.sensor-status.high{color:var(--red)}.sensor-status.watch{color:var(--yellow)}.sensor-status.normal{color:var(--green)}.chat-window{height:330px;margin-top:20px;padding:16px;border:1px solid var(--border);border-radius:15px;overflow:auto;background:var(--card2)}.chat-message{display:flex;gap:9px;max-width:78%;margin-bottom:14px}.chat-message.user{margin-left:auto;flex-direction:row-reverse}.chat-avatar{width:30px;height:30px;flex:0 0 30px;border-radius:9px;display:grid;place-items:center;background:rgba(37,211,216,.08);color:var(--cyan)}.chat-message p{margin:0;padding:10px 12px;border-radius:11px;background:var(--card);color:var(--muted);font-size:12px;line-height:1.5}.chat-message.user p{background:rgba(37,211,216,.1);color:var(--text)}.chat-input{display:flex;gap:8px;margin-top:10px}.chat-input input{flex:1}.chat-input button{width:44px;border:0;border-radius:10px;background:var(--cyan);color:#052026}.quick-prompts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.quick-prompts button{border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:999px;padding:7px 10px;font-size:10px}.network-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.network-card{padding:20px;border:1px solid var(--border);border-radius:15px;background:var(--card2)}.network-card h3{margin:15px 0 4px}.network-card p{margin:0 0 18px;color:var(--muted);font-size:12px}.network-card b{font-size:10px;color:var(--green)}.settings-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 0;border-bottom:1px solid var(--border);max-width:800px}.settings-row>div{display:flex;flex-direction:column;gap:6px}.settings-row span{font-size:11px;color:var(--muted)}.settings-row select,.theme-switch{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:10px;padding:9px 12px}.theme-switch{display:flex;gap:7px;align-items:center}
+.login-shell{min-height:100vh;display:grid;place-items:center;padding:25px;background:radial-gradient(circle at 50% 30%,rgba(37,211,216,.1),transparent 30%),var(--bg)}.login-card{width:min(430px,100%);padding:35px;border:1px solid var(--border);border-radius:22px;background:var(--card);box-shadow:0 25px 80px rgba(0,0,0,.25)}.brand-mark{width:64px;height:64px;border-radius:18px;margin-bottom:22px}.login-card h1{font-size:29px;margin:14px 0 8px}.login-card>p{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:24px}.login-card label{display:block;color:var(--muted);font-size:11px;margin:14px 0 6px}.login-card input{width:100%}.login-card .primary-button,.login-card .secondary-button{width:100%;margin-top:15px}.or-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:9px;margin:20px 0}.or-divider:before,.or-divider:after{content:"";height:1px;background:var(--border);flex:1}
+@media(max-width:1120px){.metric-grid{grid-template-columns:repeat(2,1fr)}.dashboard-grid,.dashboard-grid.three{grid-template-columns:1fr 1fr}.hotspot-page-grid,.sensor-grid{grid-template-columns:repeat(2,1fr)}.header-actions .connection{display:none}.brand h1{font-size:20px}}
+@media(max-width:820px){.sidebar{transform:translateX(-105%);transition:transform .2s}.sidebar.open{transform:translateX(0)}.sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);border:0;z-index:25}.mobile-close{display:block;margin-left:auto;background:transparent;border:0;color:var(--muted)}.main-shell{margin-left:0}.menu-button{display:grid;place-items:center;border:1px solid var(--border);background:transparent;color:var(--text);width:40px;height:40px;border-radius:10px}.topbar{padding:14px 18px;gap:10px}.brand{flex:1}.brand-icon{display:none}.brand p{display:none}.header-actions .city-select{max-width:145px}.header-actions .refresh-button{font-size:0;width:40px;padding:0;justify-content:center}.dashboard{padding:22px 18px 45px}.hero-intro{display:block}.flow-strip{margin-top:18px}.context-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.metric-grid,.dashboard-grid,.dashboard-grid.three,.network-grid,.hotspot-page-grid,.sensor-grid{grid-template-columns:1fr}.metric-value{font-size:36px}.hero-intro h2{font-size:25px}.header-actions .city-select{max-width:125px}.language-select{display:none}.footer{padding:0 18px 22px;flex-wrap:wrap}.page-card{padding:20px}.map-placeholder{height:280px}.chat-message{max-width:92%}}
+/* =========================================================
+   BRICS HEADER FIX
+   Keeps title + subtitle properly aligned on desktop
+   ========================================================= */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 124px;
+  padding: 18px 32px;
+}
+
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: visible;
+}
+
+.topbar .brand > div:last-child {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: visible;
+}
+
+.topbar .brand h1 {
+  margin: 0;
+  white-space: nowrap;
+  word-break: normal;
+  overflow: visible;
+  font-size: clamp(28px, 2vw, 36px);
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+}
+
+.topbar .brand h1 span {
+  white-space: nowrap;
+}
+
+.topbar .brand p {
+  margin: 8px 0 0;
+  white-space: nowrap;
+  word-break: normal;
+  overflow: visible;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.topbar .brand-icon {
+  flex: 0 0 56px;
+}
+
+.topbar .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Keep controls from forcing the brand to wrap */
+.topbar .connection,
+.topbar .city-select,
+.topbar .icon-button,
+.topbar .language-select,
+.topbar .refresh-button {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   Desktop
+   ========================================================= */
+
+@media (min-width: 1200px) {
+  .topbar .brand h1 {
+    font-size: 34px;
+  }
+
+  .topbar .brand p {
+    font-size: 17px;
+  }
+}
+
+/* =========================================================
+   Medium screens
+   ========================================================= */
+
+@media (max-width: 1199px) {
+  .topbar {
+    gap: 18px;
+    padding: 16px 24px;
+  }
+
+  .topbar .brand h1 {
+    font-size: 28px;
+  }
+
+  .topbar .brand p {
+    font-size: 15px;
+  }
+
+  .topbar .header-actions {
+    gap: 8px;
+  }
+}
+
+/* =========================================================
+   Mobile / narrow screens
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .topbar {
+    min-height: auto;
+    flex-wrap: wrap;
+  }
+
+  .topbar .brand {
+    flex: 1 1 100%;
+  }
+
+  .topbar .brand h1 {
+    white-space: normal;
+    font-size: 28px;
+  }
+
+  .topbar .brand p {
+    white-space: normal;
+    font-size: 14px;
+  }
+
+  .topbar .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+/* =========================================================
+   FINAL HEADER LAYOUT FIX
+   ========================================================= */
+
+.topbar {
+  display: flex !important;
+  align-items: center !important;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 120px;
+  padding: 18px 28px !important;
+  gap: 24px;
+  overflow: hidden;
+}
+
+/* Brand occupies only the space available before controls */
+.topbar .brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 760px);
+  overflow: visible !important;
+}
+
+/* Icon must not shrink */
+.topbar .brand-icon {
+  flex: 0 0 58px !important;
+  width: 58px;
+  height: 58px;
+}
+
+/* Title/subtitle container */
+.topbar .brand > div:last-child {
+  min-width: 0 !important;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Main title */
+.topbar .brand h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 32px !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.7px;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "Environmental Intelligence" */
+.topbar .brand h1 span {
+  white-space: nowrap !important;
+}
+
+/* Subtitle */
+.topbar .brand p {
+  margin: 7px 0 0 !important;
+  padding: 0 !important;
+  font-size: 15px !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Right-side controls */
+.topbar .header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  width: auto;
+  max-width: none;
+  margin-left: auto !important;
+  position: relative;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+/* Prevent individual controls from shrinking */
+.topbar .header-actions > * {
+  flex-shrink: 0 !important;
+}
+
+/* Connection status */
+.topbar .connection {
+  min-width: 145px;
+}
+
+/* City selector */
+.topbar .city-select {
+  min-width: 250px;
+}
+
+/* Refresh button */
+.topbar .refresh-button {
+  min-width: 125px;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1500px) {
+  .topbar .brand {
+    max-width: calc(100% - 730px);
+  }
+
+  .topbar .brand h1 {
+    font-size: 34px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 16px !important;
+  }
+}
+
+/* =========================================================
+   MEDIUM DESKTOP
+   ========================================================= */
+
+@media (max-width: 1400px) {
+  .topbar {
+    gap: 16px;
+    padding: 16px 20px !important;
+  }
+
+  .topbar .brand {
+    max-width: calc(100% - 650px);
+  }
+
+  .topbar .brand h1 {
+    font-size: 28px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 14px !important;
+  }
+
+  .topbar .city-select {
+    min-width: 210px;
+  }
+
+  .topbar .connection {
+    min-width: 120px;
+  }
+}
+
+/* =========================================================
+   SMALLER SCREENS
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .topbar .brand {
+    max-width: calc(100% - 430px);
+  }
+
+  .topbar .brand h1 {
+    font-size: 25px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 13px !important;
+  }
+
+  .topbar .connection {
+    display: none;
+  }
+
+  .topbar .city-select {
+    min-width: 190px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+  .topbar {
+    min-height: auto;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .topbar .brand {
+    max-width: 100%;
+    flex: 1 1 100% !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 25px !important;
+    white-space: normal !important;
+  }
+
+  .topbar .brand p {
+    white-space: normal !important;
+  }
+
+  .topbar .header-actions {
+    width: 100%;
+    justify-content: flex-end !important;
+  }
+}
+/* =========================================================
+   BRICS INDIA 2026 OFFICIAL LOGO
+   ========================================================= */
+
+.logo-placeholder {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 64px !important;
+  height: 64px !important;
+  padding: 7px !important;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.logo-placeholder img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.topbar .brand-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 64px !important;
+  height: 64px !important;
+  flex: 0 0 64px !important;
+  padding: 7px !important;
+  box-sizing: border-box;
+}
+
+.topbar .brand-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* Keep the live indicator above the logo */
+.topbar .brand-icon .live-dot {
+  position: absolute;
+}
+
+/* Sidebar product name */
+.sidebar-brand b {
+  display: block;
+  white-space: nowrap;
+}
+
+/* Main product title */
+.topbar .brand h1 {
+  white-space: nowrap !important;
+}
+
+.topbar .brand h1 span {
+  white-space: nowrap !important;
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+  .logo-placeholder {
+    width: 54px !important;
+    height: 54px !important;
+  }
+
+  .topbar .brand-icon {
+    width: 54px !important;
+    height: 54px !important;
+    flex-basis: 54px !important;
+  }
+}
+/* =========================================================
+   BRICS ECOSPHERE — HEADER ALIGNMENT FIX
+   ========================================================= */
+
+/* Main header */
+.topbar {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 124px !important;
+  padding: 18px 28px !important;
+  gap: 24px !important;
+  box-sizing: border-box !important;
+}
+
+/* ---------------------------------------------------------
+   BRAND BLOCK
+   --------------------------------------------------------- */
+
+.topbar .brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  overflow: visible !important;
+}
+
+.topbar .brand-icon {
+  position: relative !important;
+
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+
+  flex: 0 0 64px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 6px !important;
+  box-sizing: border-box !important;
+}
+
+.topbar .brand-icon img {
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* Container holding title + subtitles */
+.topbar .brand > div:last-child {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+
+  overflow: visible !important;
+}
+
+/* ---------------------------------------------------------
+   PRODUCT NAME
+   --------------------------------------------------------- */
+
+.topbar .brand h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: 32px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.05 !important;
+  letter-spacing: -0.8px !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.topbar .brand h1 span {
+  white-space: nowrap !important;
+}
+
+/* ---------------------------------------------------------
+   DESCRIPTIVE SUBTITLE
+   --------------------------------------------------------- */
+
+.topbar .brand p {
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+
+  font-size: 15px !important;
+  font-weight: 400 !important;
+
+  line-height: 1.25 !important;
+
+  white-space: nowrap !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* ---------------------------------------------------------
+   HEADER CONTROLS
+   --------------------------------------------------------- */
+
+.topbar .header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  flex: 0 0 auto !important;
+
+  gap: 9px !important;
+  margin-left: auto !important;
+
+  white-space: nowrap !important;
+
+  position: relative !important;
+  z-index: 50 !important;
+}
+
+/* LIVE */
+.topbar .connection {
+  min-width: 120px !important;
+  height: 64px !important;
+  box-sizing: border-box !important;
+}
+
+/* City selector */
+.topbar .city-select {
+  width: 290px !important;
+  min-width: 290px !important;
+  height: 64px !important;
+  box-sizing: border-box !important;
+}
+
+/* Theme */
+.topbar .icon-button {
+  width: 54px !important;
+  min-width: 54px !important;
+  height: 54px !important;
+}
+
+/* Language */
+.topbar .language-select {
+  width: 52px !important;
+  min-width: 52px !important;
+}
+
+/* Refresh */
+.topbar .refresh-button {
+  min-width: 120px !important;
+  height: 54px !important;
+}
+
+/* ---------------------------------------------------------
+   LARGE SCREEN — give the branding enough space
+   --------------------------------------------------------- */
+
+@media (min-width: 1600px) {
+
+  .topbar .brand h1 {
+    font-size: 34px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 16px !important;
+  }
+
+  .topbar .city-select {
+    width: 300px !important;
+    min-width: 300px !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   MEDIUM DESKTOP
+   --------------------------------------------------------- */
+
+@media (max-width: 1400px) {
+
+  .topbar {
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+    gap: 14px !important;
+  }
+
+  .topbar .brand {
+    gap: 14px !important;
+  }
+
+  .topbar .brand-icon {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    flex-basis: 58px !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 28px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 14px !important;
+  }
+
+  .topbar .city-select {
+    width: 245px !important;
+    min-width: 245px !important;
+  }
+
+  .topbar .connection {
+    min-width: 105px !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   SMALLER DESKTOP
+   --------------------------------------------------------- */
+
+@media (max-width: 1150px) {
+
+  .topbar .brand h1 {
+    font-size: 25px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 13px !important;
+  }
+
+  .topbar .city-select {
+    width: 210px !important;
+    min-width: 210px !important;
+  }
+
+  .topbar .connection {
+    min-width: 95px !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 800px) {
+
+  .topbar {
+    flex-wrap: wrap !important;
+    min-height: auto !important;
+  }
+
+  .topbar .brand {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 25px !important;
+    white-space: normal !important;
+  }
+
+  .topbar .brand p {
+    white-space: normal !important;
+  }
+
+  .topbar .header-actions {
+    width: 100% !important;
+    justify-content: flex-end !important;
+  }
+}
+/* =========================================================
+   BRICS ECOSPHERE — DEFINITIVE HEADER LAYOUT
+   ========================================================= */
+
+.topbar {
+  display: grid !important;
+
+  grid-template-columns: minmax(520px, 1fr) auto !important;
+  align-items: center !important;
+
+  width: 100% !important;
+  min-height: 124px !important;
+
+  padding: 18px 28px !important;
+  gap: 24px !important;
+
+  box-sizing: border-box !important;
+
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   BRAND AREA
+   ========================================================= */
+
+.topbar .brand {
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 16px !important;
+
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+
+  overflow: hidden !important;
+}
+
+.topbar .brand-icon {
+  position: relative !important;
+
+  flex: 0 0 64px !important;
+
+  width: 64px !important;
+  height: 64px !important;
+
+  padding: 5px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  box-sizing: border-box !important;
+}
+
+.topbar .brand-icon img {
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: contain !important;
+
+  display: block !important;
+}
+
+/* Text container */
+.topbar .brand > div:last-child {
+  min-width: 0 !important;
+
+  flex: 1 1 auto !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   PRODUCT NAME
+   ========================================================= */
+
+.topbar .brand h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: 31px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.1 !important;
+  letter-spacing: -0.7px !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.topbar .brand h1 span {
+  white-space: nowrap !important;
+}
+
+/* =========================================================
+   SUBTITLE
+   ========================================================= */
+
+.topbar .brand p {
+  margin: 7px 0 0 !important;
+  padding: 0 !important;
+
+  font-size: 15px !important;
+  font-weight: 400 !important;
+
+  line-height: 1.25 !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* =========================================================
+   RIGHT CONTROLS
+   ========================================================= */
+
+.topbar .header-actions {
+  grid-column: 2 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+
+  width: auto !important;
+
+  flex: none !important;
+
+  margin: 0 !important;
+
+  position: relative !important;
+  z-index: 100 !important;
+
+  white-space: nowrap !important;
+}
+
+/* Make the controls compact enough to coexist with branding */
+
+.topbar .connection {
+  width: 125px !important;
+  min-width: 125px !important;
+
+  height: 54px !important;
+
+  box-sizing: border-box !important;
+}
+
+.topbar .city-select {
+  width: 270px !important;
+  min-width: 270px !important;
+  max-width: 270px !important;
+
+  height: 54px !important;
+
+  box-sizing: border-box !important;
+}
+
+.topbar .icon-button {
+  width: 54px !important;
+  min-width: 54px !important;
+  height: 54px !important;
+
+  flex-shrink: 0 !important;
+}
+
+.topbar .language-select {
+  width: 48px !important;
+  min-width: 48px !important;
+
+  flex-shrink: 0 !important;
+}
+
+.topbar .refresh-button {
+  width: 125px !important;
+  min-width: 125px !important;
+
+  height: 54px !important;
+
+  flex-shrink: 0 !important;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1600px) {
+
+  .topbar {
+    grid-template-columns: minmax(600px, 1fr) auto !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 32px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 15px !important;
+  }
+
+  .topbar .city-select {
+    width: 290px !important;
+    min-width: 290px !important;
+    max-width: 290px !important;
+  }
+}
+
+/* =========================================================
+   MEDIUM DESKTOP
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .topbar {
+    grid-template-columns: minmax(420px, 1fr) auto !important;
+
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+
+    gap: 14px !important;
+  }
+
+  .topbar .brand-icon {
+    flex-basis: 58px !important;
+
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 27px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 14px !important;
+  }
+
+  .topbar .connection {
+    width: 110px !important;
+    min-width: 110px !important;
+  }
+
+  .topbar .city-select {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+  }
+
+  .topbar .refresh-button {
+    width: 110px !important;
+    min-width: 110px !important;
+  }
+}
+
+/* =========================================================
+   SMALL DESKTOP
+   ========================================================= */
+
+@media (max-width: 1150px) {
+
+  .topbar {
+    grid-template-columns: minmax(300px, 1fr) auto !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 24px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 13px !important;
+  }
+
+  .topbar .connection {
+    display: none !important;
+  }
+
+  .topbar .city-select {
+    width: 190px !important;
+    min-width: 190px !important;
+    max-width: 190px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .topbar {
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    min-height: auto !important;
+
+    overflow: visible !important;
+  }
+
+  .topbar .brand {
+    width: 100% !important;
+
+    flex: 1 1 100% !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 24px !important;
+
+    white-space: normal !important;
+  }
+
+  .topbar .brand p {
+    white-space: normal !important;
+  }
+
+  .topbar .header-actions {
+    width: 100% !important;
+
+    justify-content: flex-end !important;
+  }
+}
+/* =========================================================
+   BRICS ECOSPHERE — FINAL HEADER SPACE FIX
+   ========================================================= */
+
+.topbar {
+  display: grid !important;
+
+  /* Brand gets remaining space, controls get fixed space */
+  grid-template-columns: minmax(0, 1fr) 700px !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  min-height: 124px !important;
+
+  padding: 18px 24px !important;
+  gap: 18px !important;
+
+  box-sizing: border-box !important;
+
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.topbar .brand {
+  grid-column: 1 !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  gap: 16px !important;
+
+  overflow: hidden !important;
+}
+
+.topbar .brand-icon {
+  flex: 0 0 64px !important;
+
+  width: 64px !important;
+  height: 64px !important;
+
+  min-width: 64px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 5px !important;
+
+  box-sizing: border-box !important;
+}
+
+.topbar .brand-icon img {
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: contain !important;
+
+  display: block !important;
+}
+
+.topbar .brand > div:last-child {
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  flex: 1 1 auto !important;
+
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   PRODUCT TITLE
+   ========================================================= */
+
+.topbar .brand h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: 31px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.1 !important;
+  letter-spacing: -0.7px !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.topbar .brand h1 span {
+  white-space: nowrap !important;
+}
+
+/* =========================================================
+   SUBTITLE
+   ========================================================= */
+
+.topbar .brand p {
+  margin: 7px 0 0 !important;
+  padding: 0 !important;
+
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+
+  white-space: nowrap !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* =========================================================
+   RIGHT CONTROLS
+   ========================================================= */
+
+.topbar .header-actions {
+  grid-column: 2 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  width: 700px !important;
+  min-width: 700px !important;
+  max-width: 700px !important;
+
+  margin: 0 !important;
+
+  gap: 7px !important;
+
+  box-sizing: border-box !important;
+
+  white-space: nowrap !important;
+
+  overflow: visible !important;
+
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+/* =========================================================
+   LIVE STATUS
+   ========================================================= */
+
+.topbar .connection {
+  width: 115px !important;
+  min-width: 115px !important;
+  max-width: 115px !important;
+
+  height: 54px !important;
+
+  box-sizing: border-box !important;
+
+  flex-shrink: 0 !important;
+}
+
+/* =========================================================
+   CITY
+   ========================================================= */
+
+.topbar .city-select {
+  width: 270px !important;
+  min-width: 270px !important;
+  max-width: 270px !important;
+
+  height: 54px !important;
+
+  box-sizing: border-box !important;
+
+  flex-shrink: 0 !important;
+
+  overflow: hidden !important;
+}
+
+.topbar .city-select select {
+  min-width: 0 !important;
+  width: 100% !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* =========================================================
+   THEME
+   ========================================================= */
+
+.topbar .icon-button {
+  width: 54px !important;
+  min-width: 54px !important;
+  max-width: 54px !important;
+
+  height: 54px !important;
+
+  flex-shrink: 0 !important;
+}
+
+/* =========================================================
+   LANGUAGE
+   ========================================================= */
+
+.topbar .language-select {
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+
+  flex-shrink: 0 !important;
+}
+
+/* =========================================================
+   REFRESH
+   ========================================================= */
+
+.topbar .refresh-button {
+  width: 125px !important;
+  min-width: 125px !important;
+  max-width: 125px !important;
+
+  height: 54px !important;
+
+  box-sizing: border-box !important;
+
+  flex-shrink: 0 !important;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1600px) {
+
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) 700px !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 32px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 15px !important;
+  }
+}
+
+/* =========================================================
+   MEDIUM DESKTOP
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) 620px !important;
+
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .topbar .header-actions {
+    width: 620px !important;
+    min-width: 620px !important;
+    max-width: 620px !important;
+  }
+
+  .topbar .brand-icon {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    flex-basis: 58px !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 27px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 14px !important;
+  }
+
+  .topbar .city-select {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+  }
+
+  .topbar .connection {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+  }
+
+  .topbar .refresh-button {
+    width: 105px !important;
+    min-width: 105px !important;
+    max-width: 105px !important;
+  }
+}
+
+/* =========================================================
+   SMALLER DESKTOP
+   ========================================================= */
+
+@media (max-width: 1150px) {
+
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) 430px !important;
+  }
+
+  .topbar .header-actions {
+    width: 430px !important;
+    min-width: 430px !important;
+    max-width: 430px !important;
+  }
+
+  .topbar .connection {
+    display: none !important;
+  }
+
+  .topbar .city-select {
+    width: 190px !important;
+    min-width: 190px !important;
+    max-width: 190px !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 24px !important;
+  }
+
+  .topbar .brand p {
+    font-size: 13px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .topbar {
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    min-height: auto !important;
+
+    overflow: visible !important;
+  }
+
+  .topbar .brand {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  .topbar .brand h1 {
+    font-size: 24px !important;
+    white-space: normal !important;
+  }
+
+  .topbar .brand p {
+    white-space: normal !important;
+  }
+
+  .topbar .header-actions {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* =========================================================
+   HYPERLOCAL MAP — CSS HOTSPOT MARKERS
+   Avoids emoji/Unicode rendering problems
+   ========================================================= */
+
+.map-pin {
+  position: absolute !important;
+
+  width: 18px !important;
+  height: 18px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 50% !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  z-index: 10 !important;
+}
+
+.map-pin i {
+  display: block !important;
+
+  width: 12px !important;
+  height: 12px !important;
+
+  border-radius: 50% !important;
+
+  background: currentColor !important;
+
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,0.08),
+    0 0 18px currentColor !important;
+}
+
+/* HIGH */
+.map-pin.p1,
+.map-pin.p2 {
+  color: #ff5c5c !important;
+}
+
+/* MODERATE */
+.map-pin.p3 {
+  color: #ff9f43 !important;
+}
+
+/* LOWER RISK */
+.map-pin.p4 {
+  color: #f6c344 !important;
+}
+
+/* Optional pulse animation */
+
+.map-pin::after {
+  content: "" !important;
+
+  position: absolute !important;
+
+  width: 22px !important;
+  height: 22px !important;
+
+  border: 1px solid currentColor !important;
+
+  border-radius: 50% !important;
+
+  opacity: 0.35 !important;
+
+  animation: hotspotPulse 2s ease-out infinite !important;
+}
+
+@keyframes hotspotPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.55;
+  }
+
+  70% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+/* Map label */
+
+.map-label {
+  letter-spacing: 2px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* =========================================================
+   MAP POSITIONING
+   ========================================================= */
+
+.map-pin.p1 {
+  left: 35% !important;
+  top: 38% !important;
+}
+
+.map-pin.p2 {
+  left: 70% !important;
+  top: 40% !important;
+}
+
+.map-pin.p3 {
+  left: 58% !important;
+  top: 57% !important;
+}
+
+.map-pin.p4 {
+  left: 47% !important;
+  top: 76% !important;
+}
+
+/* =========================================================
+   FINAL HOTSPOT MARKER FIX
+   CSS ONLY — NO TEXT / EMOJI
+   ========================================================= */
+
+.map-pin {
+  position: absolute !important;
+
+  width: 24px !important;
+  height: 24px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  font-size: 0 !important;
+  line-height: 0 !important;
+
+  color: transparent !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  z-index: 20 !important;
+}
+
+.map-pin::before {
+  content: "" !important;
+
+  display: block !important;
+
+  width: 12px !important;
+  height: 12px !important;
+
+  border-radius: 50% !important;
+
+  background: currentColor !important;
+}
+
+.map-pin::after {
+  content: "" !important;
+
+  position: absolute !important;
+
+  width: 24px !important;
+  height: 24px !important;
+
+  border: 1px solid currentColor !important;
+
+  border-radius: 50% !important;
+
+  animation: hotspotPulse 2s ease-out infinite !important;
+}
+
+.map-pin i {
+  display: none !important;
+}
+
+/* Risk colors */
+
+.map-pin.p1,
+.map-pin.p2 {
+  color: #ff5555 !important;
+}
+
+.map-pin.p3 {
+  color: #ff9f43 !important;
+}
+
+.map-pin.p4 {
+  color: #f6c344 !important;
+}
+
+@keyframes hotspotPulse {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.7;
+  }
+
+  70% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+/* =========================================================
+   BRICS ECOSPHERE — LOGIN PAGE
+   ========================================================= */
+
+.login-page {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  padding: 40px 20px;
+
+  box-sizing: border-box;
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(32, 214, 218, 0.08),
+      transparent 38%
+    ),
+    #06131b;
+
+  overflow: auto;
+}
+
+/* Background glow */
+
+.login-glow {
+  position: fixed;
+
+  width: 420px;
+  height: 420px;
+
+  border-radius: 50%;
+
+  filter: blur(100px);
+
+  pointer-events: none;
+
+  opacity: 0.12;
+}
+
+.login-glow-one {
+  background: #18d5d9;
+
+  top: -180px;
+  left: -120px;
+}
+
+.login-glow-two {
+  background: #1685a0;
+
+  right: -150px;
+  bottom: -180px;
+}
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.login-card {
+  position: relative;
+
+  width: min(640px, 100%);
+
+  padding: 52px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(105, 158, 180, 0.28);
+
+  border-radius: 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 37, 48, 0.96),
+      rgba(10, 27, 37, 0.96)
+    );
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255,255,255,0.025);
+
+  z-index: 2;
+}
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.login-brand {
+  display: flex;
+
+  align-items: center;
+
+  gap: 22px;
+
+  margin-bottom: 42px;
+}
+
+.login-logo {
+  width: 96px;
+  height: 96px;
+
+  flex: 0 0 96px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 7px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(31, 219, 222, 0.75);
+
+  border-radius: 22px;
+
+  background: rgba(5, 25, 34, 0.8);
+
+  box-shadow:
+    0 0 25px rgba(28, 213, 216, 0.12);
+}
+
+.login-logo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  display: block;
+}
+
+.login-brand-text h1 {
+  margin: 0;
+
+  font-size: 31px;
+
+  line-height: 1.1;
+
+  font-weight: 750;
+
+  letter-spacing: -0.7px;
+
+  color: #eef5f8;
+}
+
+.login-brand-text h1 span {
+  color: #38d8dc;
+}
+
+.login-brand-text p {
+  margin: 8px 0 0;
+
+  font-size: 16px;
+
+  color: #8ea5b3;
+}
+
+/* =========================================================
+   KICKER
+   ========================================================= */
+
+.login-kicker {
+  margin-bottom: 26px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 3px;
+
+  color: #819aaa;
+}
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.login-title {
+  margin: 0;
+
+  font-size: clamp(38px, 5vw, 52px);
+
+  line-height: 1.08;
+
+  letter-spacing: -1.8px;
+
+  font-weight: 800;
+
+  color: #f4f7f9;
+}
+
+.login-title::first-letter {
+  color: #f4f7f9;
+}
+
+.login-description {
+  margin: 22px 0 38px;
+
+  font-size: 17px;
+
+  line-height: 1.5;
+
+  color: #8da8b8;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.login-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 22px;
+}
+
+.login-form label {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+.login-form label span {
+  font-size: 14px;
+
+  color: #94aabd;
+}
+
+.login-form input {
+  width: 100%;
+
+  height: 70px;
+
+  padding: 0 20px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(88, 137, 158, 0.28);
+
+  border-radius: 15px;
+
+  outline: none;
+
+  background: rgba(22, 42, 54, 0.78);
+
+  color: #eef6f8;
+
+  font-size: 18px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-form input::placeholder {
+  color: #6f8796;
+}
+
+.login-form input:focus {
+  border-color: #25d3d7;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 211, 215, 0.10);
+}
+
+/* =========================================================
+   SIGN IN
+   ========================================================= */
+
+.login-submit {
+  width: 100%;
+
+  height: 68px;
+
+  margin-top: 2px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  border: 0;
+
+  border-radius: 15px;
+
+  background: #2ed0d5;
+
+  color: #04151b;
+
+  font-size: 20px;
+
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-submit:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 30px rgba(46, 208, 213, 0.22);
+}
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.login-divider {
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+  margin: 32px 0;
+}
+
+.login-divider span {
+  height: 1px;
+
+  flex: 1;
+
+  background: rgba(104, 145, 160, 0.28);
+}
+
+.login-divider b {
+  font-size: 13px;
+
+  font-weight: 500;
+
+  color: #8298a7;
+}
+
+/* =========================================================
+   DEMO BUTTON
+   ========================================================= */
+
+.demo-button {
+  width: 100%;
+
+  height: 66px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  border: 1px solid rgba(93, 142, 163, 0.30);
+
+  border-radius: 15px;
+
+  background: transparent;
+
+  color: #edf5f7;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.demo-button svg {
+  color: #27d6da;
+}
+
+.demo-button:hover {
+  border-color: rgba(39, 214, 218, 0.55);
+
+  background: rgba(39, 214, 218, 0.05);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  .login-page {
+    padding: 20px 14px;
+  }
+
+  .login-card {
+    padding: 32px 24px;
+
+    border-radius: 22px;
+  }
+
+  .login-brand {
+    gap: 16px;
+
+    margin-bottom: 32px;
+  }
+
+  .login-logo {
+    width: 72px;
+    height: 72px;
+
+    flex-basis: 72px;
+
+    border-radius: 17px;
+  }
+
+  .login-brand-text h1 {
+    font-size: 24px;
+  }
+
+  .login-brand-text p {
+    font-size: 14px;
+  }
+
+  .login-kicker {
+    font-size: 11px;
+
+    letter-spacing: 2px;
+  }
+
+  .login-title {
+    font-size: 36px;
+  }
+
+  .login-description {
+    font-size: 15px;
+  }
+}
