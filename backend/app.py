@@ -11,6 +11,7 @@ from backend.risk_engine import generate_risk_assessment
 from backend.decision_engine import build_decision
 from backend.services.citizen_reports import create_report, get_report, get_reports
 from backend.services.hotspot_fusion import fuse_hotspots
+from backend.services.authority_alerts import generate_authority_alerts
 
 app = FastAPI(
     title="BRICS Environmental Intelligence",
@@ -305,4 +306,37 @@ def hotspot_intelligence(city: str):
         raise HTTPException(
             status_code=500,
             detail=f"Hotspot fusion failed: {str(exc)}",
+        )
+
+@app.get("/alerts/{city}")
+def authority_alerts(city: str):
+    try:
+        prediction = get_prediction(city)
+
+        reports = get_reports(city=city)
+
+        fused = fuse_hotspots(
+            prediction=prediction,
+            citizen_reports=reports,
+        )
+
+        alerts = generate_authority_alerts(
+            fusion_result=fused,
+        )
+
+        return {
+            "status": "success",
+            "data": alerts,
+        }
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Authority alert generation failed: {str(exc)}",
         )
