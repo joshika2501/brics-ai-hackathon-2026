@@ -10,6 +10,7 @@ from backend.services.simulation import simulate_scenario
 from backend.risk_engine import generate_risk_assessment
 from backend.decision_engine import build_decision
 from backend.services.citizen_reports import create_report, get_report, get_reports
+from backend.services.hotspot_fusion import fuse_hotspots
 
 app = FastAPI(
     title="BRICS Environmental Intelligence",
@@ -276,3 +277,32 @@ def citizen_report_by_id(report_id: str):
         "status": "success",
         "report": report,
     }
+
+@app.get("/hotspots/{city}")
+def hotspot_intelligence(city: str):
+    try:
+        prediction = get_prediction(city)
+
+        reports = get_reports(city=city)
+
+        fused = fuse_hotspots(
+            prediction=prediction,
+            citizen_reports=reports,
+        )
+
+        return {
+            "status": "success",
+            "data": fused,
+        }
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Hotspot fusion failed: {str(exc)}",
+        )
