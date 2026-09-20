@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, HTTPException
+﻿from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,6 +12,7 @@ from backend.decision_engine import build_decision
 from backend.services.citizen_reports import create_report, get_report, get_reports
 from backend.services.hotspot_fusion import fuse_hotspots
 from backend.services.authority_alerts import generate_authority_alerts
+from backend.services.citizen_vision import analyze_environmental_photo
 
 app = FastAPI(
     title="BRICS Environmental Intelligence",
@@ -339,4 +340,67 @@ def authority_alerts(city: str):
         raise HTTPException(
             status_code=500,
             detail=f"Authority alert generation failed: {str(exc)}",
+        )
+
+@app.post("/citizen/analyze-photo")
+async def analyze_citizen_photo(
+    file: UploadFile = File(...),
+    description: str = "",
+):
+    try:
+        if not file.content_type:
+            raise HTTPException(
+                status_code=400,
+                detail="Image content type is required.",
+            )
+
+        allowed_types = {
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        }
+
+        if file.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Unsupported image type. "
+                    "Use JPEG, PNG, or WebP."
+                ),
+            )
+
+        image_bytes = await file.read()
+
+        if not image_bytes:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded image is empty.",
+            )
+
+        if len(image_bytes) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=413,
+                detail="Image must be smaller than 10 MB.",
+            )
+
+        analysis = analyze_environmental_photo(
+            image_bytes=image_bytes,
+            mime_type=file.content_type,
+            description=description,
+        )
+
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "analysis": analysis,
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Citizen photo analysis failed: {str(exc)}",
         )
