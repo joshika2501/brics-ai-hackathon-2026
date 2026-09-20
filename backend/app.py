@@ -9,7 +9,7 @@ from backend.services.live_features import get_live_feature_row
 from backend.services.simulation import simulate_scenario
 from backend.risk_engine import generate_risk_assessment
 from backend.decision_engine import build_decision
-
+from backend.services.citizen_reports import create_report, get_report, get_reports
 
 app = FastAPI(
     title="BRICS Environmental Intelligence",
@@ -85,6 +85,17 @@ class SimulationRequest(BaseModel):
         ...,
         description="Feature values to change for the what-if scenario"
     )
+
+class CitizenReportRequest(BaseModel):
+    city: str = Field(...)
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    event_type: str = Field(default="UNKNOWN")
+    description: str = Field(default="")
+    pm25: float | None = Field(default=None, ge=0)
+    pm10: float | None = Field(default=None, ge=0)
+    sensor_source: str | None = None
+    photo_reference: str | None = None
 
 
 @app.post("/simulate")
@@ -214,3 +225,54 @@ def predict(city: str):
             detail=str(exc),
         )
 
+@app.post("/citizen/report")
+def citizen_report(request: CitizenReportRequest):
+    try:
+        report = create_report(
+            city=request.city,
+            latitude=request.latitude,
+            longitude=request.longitude,
+            event_type=request.event_type,
+            description=request.description,
+            pm25=request.pm25,
+            pm10=request.pm10,
+            sensor_source=request.sensor_source,
+            photo_reference=request.photo_reference,
+        )
+
+        return {
+            "status": "success",
+            "report": report,
+        }
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+
+@app.get("/citizen/reports")
+def citizen_reports(city: str | None = None):
+    reports = get_reports(city=city)
+
+    return {
+        "count": len(reports),
+        "reports": reports,
+    }
+
+
+@app.get("/citizen/report/{report_id}")
+def citizen_report_by_id(report_id: str):
+    report = get_report(report_id)
+
+    if report is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Citizen report not found.",
+        )
+
+    return {
+        "status": "success",
+        "report": report,
+    }
