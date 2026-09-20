@@ -1,4 +1,3 @@
-from backend.services.hotspots import generate_hotspots
 from pathlib import Path
 
 import joblib
@@ -12,8 +11,13 @@ from backend.services.brics_profiles import (
     compare_forecast_to_reference,
     get_brics_profile,
 )
+from backend.services.hotspots import generate_hotspots
 from backend.services.live_features import get_live_feature_row
-
+from backend.services.model_intelligence import (
+    get_empirical_uncertainty,
+    get_model_quality,
+)
+from backend.services.anomaly_detection import detect_anomaly
 
 MODEL_DIR = Path("models/trained")
 
@@ -65,7 +69,11 @@ CITY_COORDINATES = {
 
 
 def load_model(city: str):
-    filename = city.lower().replace(" ", "_")
+
+    filename = (
+        city.lower()
+        .replace(" ", "_")
+    )
 
     model_path = (
         MODEL_DIR
@@ -128,6 +136,40 @@ def get_live_prediction(city: str):
         model.predict(observation)[0]
     )
 
+    # ---------------------------------------------------------
+    # Model intelligence
+    # ---------------------------------------------------------
+
+    model_quality = get_model_quality(
+        city
+    )
+
+    uncertainty = get_empirical_uncertainty(
+        city=city,
+        prediction=prediction,
+    )
+
+    # ---------------------------------------------------------
+    # Environmental anomaly detection
+    # ---------------------------------------------------------
+
+    anomaly_input = {
+    "pm2_5": feature_values["pm2_5"],
+    "pm10": feature_values["pm10"],
+    "nitrogen_dioxide": feature_values["nitrogen_dioxide"],
+    "temperature_2m": feature_values["temperature_2m"],
+    "relative_humidity_2m": feature_values["relative_humidity_2m"],
+    "wind_speed_10m": feature_values["wind_speed_10m"],
+    "surface_pressure": feature_values["surface_pressure"],
+    "precipitation": feature_values["precipitation"],
+    "hour": feature_values["hour"],
+    "day_of_week": feature_values["day_of_week"],
+}
+    anomaly = detect_anomaly(
+        city=city,
+        current_row=anomaly_input,
+    )
+
     current_pm25 = float(
         live_data["current_pm25"]
     )
@@ -159,12 +201,15 @@ def get_live_prediction(city: str):
         FEATURES,
         shap_values,
     ):
+
         impact = float(value)
 
         if impact > 0:
             contribution = "above_baseline"
+
         elif impact < 0:
             contribution = "below_baseline"
+
         else:
             contribution = "neutral"
 
@@ -231,65 +276,160 @@ def get_live_prediction(city: str):
     result = {
         "city": city,
         "country": coordinates["country"],
+
+        # -----------------------------------------------------
+        # NEW: MODEL INTELLIGENCE
+        # -----------------------------------------------------
+
+        "anomaly": anomaly,
+
+        # -----------------------------------------------------
+        # MODEL INTELLIGENCE
+        # -----------------------------------------------------
+
+        "model_intelligence": {
+            "model": model_quality["model"],
+
+            "performance": model_quality["test"],
+
+            "persistence_baseline": (
+                model_quality[
+                    "persistence_baseline"
+                ]
+            ),
+
+            "mae_improvement_percent": (
+                model_quality[
+                    "mae_improvement_percent"
+                ]
+            ),
+
+            "uncertainty": uncertainty,
+        },
+
+        # -----------------------------------------------------
+        # Existing forecast information
+        # -----------------------------------------------------
+
         "forecast_horizon_hours": 6,
+
         "timestamp": live_data["timestamp"],
+
         "current_pm25": round(
             current_pm25,
             2,
         ),
+
         "predicted_pm25": round(
             prediction,
             2,
         ),
+
         "risk_level": risk["risk_level"],
+
         "trend": risk["trend"],
+
         "drivers": top_evidence,
+
+        # -----------------------------------------------------
+        # Forecast
+        # -----------------------------------------------------
 
         "forecast": {
             "horizon_hours": 6,
+
             "current_pm25": round(
                 current_pm25,
                 2,
             ),
+
             "predicted_pm25": round(
                 prediction,
                 2,
             ),
         },
 
+        # -----------------------------------------------------
+        # Risk
+        # -----------------------------------------------------
+
         "risk": {
             "level": risk["risk_level"],
+
             "trend": risk["trend"]["direction"],
-            "absolute_change": risk["trend"]["absolute_change"],
-            "percentage_change": risk["trend"]["percentage_change"],
+
+            "absolute_change": (
+                risk["trend"]["absolute_change"]
+            ),
+
+            "percentage_change": (
+                risk["trend"]["percentage_change"]
+            ),
         },
+
+        # -----------------------------------------------------
+        # Evidence
+        # -----------------------------------------------------
 
         "evidence": top_evidence,
 
+        # -----------------------------------------------------
+        # Hotspots
+        # -----------------------------------------------------
+
         "hotspots": hotspots,
+
+        # -----------------------------------------------------
+        # Decision support
+        # -----------------------------------------------------
 
         "decision": decision,
 
+        # -----------------------------------------------------
+        # BRICS context
+        # -----------------------------------------------------
+
         "brics_context": {
-            "regulatory_reference": brics_profile[
-                "regulatory_reference"
-            ],
-            "reference_value": brics_context[
-                "reference_value"
-            ],
-            "reference_period": brics_context[
-                "reference_period"
-            ],
-            "comparison": brics_context[
-                "comparison"
-            ],
-            "ratio_to_reference": brics_context[
-                "ratio_to_reference"
-            ],
-            "note": brics_context[
-                "note"
-            ],
+            "regulatory_reference": (
+                brics_profile[
+                    "regulatory_reference"
+                ]
+            ),
+
+            "reference_value": (
+                brics_context[
+                    "reference_value"
+                ]
+            ),
+
+            "reference_period": (
+                brics_context[
+                    "reference_period"
+                ]
+            ),
+
+            "comparison": (
+                brics_context[
+                    "comparison"
+                ]
+            ),
+
+            "ratio_to_reference": (
+                brics_context[
+                    "ratio_to_reference"
+                ]
+            ),
+
+            "note": (
+                brics_context[
+                    "note"
+                ]
+            ),
         },
+
+        # -----------------------------------------------------
+        # Data source
+        # -----------------------------------------------------
 
         "data_source": "Open-Meteo",
     }
