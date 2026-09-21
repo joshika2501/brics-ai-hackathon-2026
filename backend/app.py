@@ -13,6 +13,7 @@ from backend.services.citizen_reports import create_report, get_report, get_repo
 from backend.services.hotspot_fusion import fuse_hotspots
 from backend.services.authority_alerts import generate_authority_alerts
 from backend.services.citizen_vision import analyze_environmental_photo
+from backend.services.satellite_intelligence import get_satellite_evidence
 
 app = FastAPI(
     title="BRICS Environmental Intelligence",
@@ -308,6 +309,33 @@ def hotspot_intelligence(city: str):
             status_code=500,
             detail=f"Hotspot fusion failed: {str(exc)}",
         )
+
+@app.get("/satellite/{city}")
+def satellite_intelligence(city: str):
+    city_key = city.strip().lower()
+
+    locations = {
+        "delhi": (28.6139, 77.2090),
+        "johannesburg": (-26.2041, 28.0473),
+        "sao paulo": (-23.5505, -46.6333),
+    }
+
+    if city_key not in locations:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Satellite location not configured for {city}",
+        )
+
+    latitude, longitude = locations[city_key]
+
+    return {
+        "status": "success",
+        "data": get_satellite_evidence(
+            latitude=latitude,
+            longitude=longitude,
+            city=city,
+        ),
+    }
 
 @app.get("/alerts/{city}")
 def authority_alerts(city: str):
