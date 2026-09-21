@@ -1,4 +1,4 @@
-﻿from math import radians, sin, cos, sqrt, atan2
+from math import radians, sin, cos, sqrt, atan2
 from typing import Any, Dict, List
 
 
@@ -82,20 +82,79 @@ def _event_evidence_score(report: Dict[str, Any]) -> float:
     return EVENT_WEIGHTS.get(event_type, EVENT_WEIGHTS["UNKNOWN"]) * 100.0
 
 
+def _visual_evidence_score(report: Dict[str, Any]) -> float:
+    """
+    Convert Gemini Vision evidence into an evidence-strength score.
+
+    The score uses the model confidence together with the
+    environmental event type observed in the image.
+
+    This is an evidence-fusion heuristic, not ground truth,
+    causal attribution, or regulatory classification.
+    """
+
+    ai_analysis = report.get("ai_analysis") or {}
+
+    if ai_analysis.get("status") != "generated":
+        return 0.0
+
+    visual_event = str(
+        ai_analysis.get("event_type", "UNKNOWN")
+    ).strip().upper()
+
+    confidence = ai_analysis.get("confidence", 0.0)
+
+    try:
+        confidence = _clamp(
+            float(confidence),
+            0.0,
+            1.0,
+        )
+    except (TypeError, ValueError):
+        return 0.0
+
+    event_weight = EVENT_WEIGHTS.get(
+        visual_event,
+        EVENT_WEIGHTS["UNKNOWN"],
+    )
+
+    return _clamp(
+        confidence * event_weight * 100.0
+    )
+
+
 def _citizen_evidence_score(report: Dict[str, Any]) -> float:
     """
-    Combine event and sensor evidence.
+    Combine citizen sensor, citizen event, and visual AI evidence.
 
-    60% sensor evidence
-    40% event evidence
+    Base citizen evidence:
+        60% sensor evidence
+        40% citizen event evidence
+
+    If Gemini Vision evidence is available:
+        80% base citizen evidence
+        20% visual evidence
+
+    The visual component is intentionally bounded so that one
+    photograph cannot dominate the complete evidence signal.
     """
 
     sensor_score = _sensor_evidence_score(report)
     event_score = _event_evidence_score(report)
 
-    return _clamp(
+    base_score = (
         0.60 * sensor_score
         + 0.40 * event_score
+    )
+
+    visual_score = _visual_evidence_score(report)
+
+    if visual_score <= 0.0:
+        return _clamp(base_score)
+
+    return _clamp(
+        0.80 * base_score
+        + 0.20 * visual_score
     )
 
 
@@ -165,6 +224,8 @@ def fuse_hotspots(
             if distance_km <= 5.0:
                 evidence_score = _citizen_evidence_score(report)
 
+                ai_analysis = report.get("ai_analysis") or {}
+
                 nearby_reports.append(
                     {
                         "report_id": report.get("report_id"),
@@ -172,6 +233,26 @@ def fuse_hotspots(
                         "distance_km": round(distance_km, 3),
                         "evidence_score": round(evidence_score, 2),
                         "description": report.get("description", ""),
+                        "visual_ai": {
+                            "status": ai_analysis.get("status"),
+                            "model": ai_analysis.get("model"),
+                            "event_type": ai_analysis.get(
+                                "event_type",
+                                "UNKNOWN",
+                            ),
+                            "confidence": ai_analysis.get(
+                                "confidence",
+                                0.0,
+                            ),
+                            "visual_evidence": ai_analysis.get(
+                                "visual_evidence",
+                                [],
+                            ),
+                            "potential_environmental_signal": ai_analysis.get(
+                                "potential_environmental_signal",
+                                "",
+                            ),
+                        },
                     }
                 )
 
@@ -269,6 +350,9 @@ def fuse_hotspots(
         "model_prediction": {
             "current_pm25": prediction.get("current_pm25"),
             "predicted_pm25": prediction.get("predicted_pm25"),
+            "forecast_horizon_hours": prediction.get(
+                "forecast_horizon_hours"
+            ),
             "risk_level": prediction.get("risk_level"),
             "trend": prediction.get("trend"),
             "anomaly": prediction.get("anomaly"),
@@ -292,3 +376,6 @@ def fuse_hotspots(
             ),
         },
     }
+
+
+

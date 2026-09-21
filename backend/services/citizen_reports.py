@@ -1,4 +1,4 @@
-﻿from datetime import datetime, timezone
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
@@ -26,6 +26,7 @@ def create_report(
     pm10: Optional[float] = None,
     sensor_source: Optional[str] = None,
     photo_reference: Optional[str] = None,
+    ai_analysis: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
 
     city = city.strip()
@@ -65,6 +66,7 @@ def create_report(
             "source": sensor_source,
         },
         "photo_reference": photo_reference,
+        "ai_analysis": ai_analysis,
         "status": "REPORTED",
         "created_at": datetime.now(timezone.utc).isoformat(),
     }

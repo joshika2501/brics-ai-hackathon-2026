@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -342,10 +342,134 @@ def authority_alerts(city: str):
             detail=f"Authority alert generation failed: {str(exc)}",
         )
 
+
+@app.post("/citizen/report-with-photo")
+async def citizen_report_with_photo(
+    city: str = Form(...),
+    latitude: float = Form(...),
+    longitude: float = Form(...),
+    event_type: str = Form(default="UNKNOWN"),
+    description: str = Form(default=""),
+    pm25: float | None = Form(default=None),
+    pm10: float | None = Form(default=None),
+    sensor_source: str | None = Form(default=None),
+    photo_reference: str | None = Form(default=None),
+    file: UploadFile = File(...),
+):
+    try:
+        if not city.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="City is required.",
+            )
+
+        if not file.content_type:
+            raise HTTPException(
+                status_code=400,
+                detail="Image content type is required.",
+            )
+
+        allowed_types = {
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        }
+
+        if file.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=400,
+                detail="Unsupported image type. Use JPEG, PNG, or WebP.",
+            )
+
+        image_bytes = await file.read()
+
+        if not image_bytes:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded image is empty.",
+            )
+
+        if len(image_bytes) > 10 * 1024 * 1024:
+            raise HTTPException(
+                status_code=413,
+                detail="Image must be smaller than 10 MB.",
+            )
+
+        # Analyze the citizen photo with Gemini Vision.
+        ai_result = analyze_environmental_photo(
+            image_bytes=image_bytes,
+            mime_type=file.content_type,
+            description=description,
+        )
+
+        # Extract only the structured visual analysis for the report.
+        visual_analysis = ai_result.get(
+            "visual_analysis",
+            {},
+        )
+
+        ai_report_evidence = {
+            "status": ai_result.get("status"),
+            "model": ai_result.get("model"),
+            "event_type": visual_analysis.get("event_type", "UNKNOWN"),
+            "confidence": visual_analysis.get("confidence", 0.0),
+            "visual_evidence": visual_analysis.get(
+                "visual_evidence",
+                [],
+            ),
+            "scene_summary": visual_analysis.get(
+                "scene_summary",
+                "",
+            ),
+            "potential_environmental_signal": visual_analysis.get(
+                "potential_environmental_signal",
+                "",
+            ),
+        }
+
+        # Preserve the citizen's original event classification.
+        report = create_report(
+            city=city,
+            latitude=latitude,
+            longitude=longitude,
+            event_type=event_type,
+            description=description,
+            pm25=pm25,
+            pm10=pm10,
+            sensor_source=sensor_source,
+            photo_reference=photo_reference or file.filename,
+            ai_analysis=ai_report_evidence,
+        )
+
+        return {
+            "status": "success",
+            "report": report,
+            "vision": {
+                "status": ai_result.get("status"),
+                "model": ai_result.get("model"),
+                "event_type": ai_report_evidence["event_type"],
+                "confidence": ai_report_evidence["confidence"],
+            },
+        }
+
+    except HTTPException:
+        raise
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Citizen report creation failed: {str(exc)}",
+        )
 @app.post("/citizen/analyze-photo")
 async def analyze_citizen_photo(
     file: UploadFile = File(...),
-    description: str = "",
+    description: str = Form(default=""),
 ):
     try:
         if not file.content_type:
@@ -404,3 +528,4 @@ async def analyze_citizen_photo(
             status_code=500,
             detail=f"Citizen photo analysis failed: {str(exc)}",
         )
+

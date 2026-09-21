@@ -1,4 +1,4 @@
-﻿from datetime import datetime, timezone
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
@@ -179,6 +179,32 @@ def _build_evidence(
                 }
             )
 
+    for citizen_item in hotspot.get(
+        "citizen_evidence",
+        [],
+    ):
+        visual_ai = citizen_item.get("visual_ai") or {}
+
+        if visual_ai.get("status") == "generated":
+            evidence.append(
+                {
+                    "type": "VISUAL_AI",
+                    "value": round(
+                        float(
+                            visual_ai.get(
+                                "confidence",
+                                0.0,
+                            )
+                        ),
+                        2,
+                    ),
+                    "description": (
+                        "Gemini Vision visual evidence from a "
+                        "geographically proximate citizen photo."
+                    ),
+                }
+            )
+
     return evidence
 
 
@@ -269,9 +295,14 @@ def generate_authority_alerts(
                 "predicted_pm25": prediction.get(
                     "predicted_pm25"
                 ),
-                "forecast_horizon_hours": prediction.get(
+                "forecast_horizon_hours": fusion_result.get(
                     "forecast_horizon_hours",
-                    (prediction.get("forecast") or {}).get("horizon_hours")
+                    prediction.get(
+                        "forecast_horizon_hours",
+                        (prediction.get("forecast") or {}).get(
+                            "horizon_hours"
+                        ),
+                    ),
                 ),
                 "risk_level": prediction.get(
                     "risk_level"
@@ -337,4 +368,6 @@ def generate_authority_alerts(
             ),
         },
     }
+
+
 
