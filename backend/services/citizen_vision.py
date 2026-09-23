@@ -1,6 +1,8 @@
 ﻿import base64
 import json
 import os
+import random
+import time
 from typing import Any, Dict, Optional
 
 from dotenv import load_dotenv
@@ -111,16 +113,56 @@ Rules:
 """
 
     try:
-        response = client.models.generate_content(
-            model=VISION_MODEL,
-            contents=[
-                types.Part.from_bytes(
-                    data=image_bytes,
-                    mime_type=mime_type,
-                ),
-                prompt,
-            ],
-        )
+        response = None
+        max_attempts = 3
+
+        for attempt in range(max_attempts):
+            try:
+                response = client.models.generate_content(
+                    model=VISION_MODEL,
+                    contents=[
+                        types.Part.from_bytes(
+                            data=image_bytes,
+                            mime_type=mime_type,
+                        ),
+                        prompt,
+                    ],
+                )
+
+                break
+
+            except Exception as exc:
+                error_text = str(exc).lower()
+
+                is_retryable = any(
+                    marker in error_text
+                    for marker in (
+                        "503",
+                        "unavailable",
+                        "high demand",
+                        "429",
+                        "resource_exhausted",
+                    )
+                )
+
+                if (
+                    not is_retryable
+                    or attempt == max_attempts - 1
+                ):
+                    raise
+
+                delay = min(
+                    (2 ** attempt) + random.uniform(0, 0.5),
+                    5,
+                )
+
+                print(
+                    "Gemini temporarily unavailable. "
+                    f"Retrying in {delay:.1f}s "
+                    f"(attempt {attempt + 2}/{max_attempts})."
+                )
+
+                time.sleep(delay)
 
         text = getattr(
             response,
@@ -224,6 +266,3 @@ Rules:
             ),
             "error": str(exc),
         }
-
-
-

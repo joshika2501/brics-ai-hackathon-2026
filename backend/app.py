@@ -361,12 +361,30 @@ def satellite_intelligence(city: str):
 def authority_alerts(city: str):
     try:
         prediction = get_prediction(city)
-
         reports = get_reports(city=city)
+
+        city_locations = {
+            "delhi": (28.6139, 77.2090),
+            "johannesburg": (-26.2041, 28.0473),
+            "sao paulo": (-23.5505, -46.6333),
+        }
+
+        location = city_locations.get(city.strip().lower())
+        atmospheric_evidence = None
+
+        if location:
+            latitude, longitude = location
+
+            atmospheric_evidence = get_satellite_evidence(
+                latitude=latitude,
+                longitude=longitude,
+                city=city,
+            )
 
         fused = fuse_hotspots(
             prediction=prediction,
             citizen_reports=reports,
+            atmospheric_evidence=atmospheric_evidence,
         )
 
         alerts = generate_authority_alerts(
@@ -389,7 +407,6 @@ def authority_alerts(city: str):
             status_code=500,
             detail=f"Authority alert generation failed: {str(exc)}",
         )
-
 
 @app.post("/citizen/report-with-photo")
 async def citizen_report_with_photo(
