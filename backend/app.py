@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from backend.services.environment import get_current_environment
 from backend.services.locations import get_location
@@ -20,7 +21,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
+class StripAPIPrefixMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        if request.scope["path"].startswith("/api"):
+            request.scope["path"] = request.scope["path"][4:] or "/"
+            request.scope["raw_path"] = request.scope["path"].encode("utf-8")
 
+        return await call_next(request)
+
+
+app.add_middleware(StripAPIPrefixMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
