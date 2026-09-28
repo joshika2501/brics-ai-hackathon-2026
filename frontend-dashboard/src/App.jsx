@@ -11,9 +11,7 @@ import {
 } from "recharts";
 import "./App.css";
 
-const API_BASE_URL = import.meta.env.PROD
-  ? "https://brics-environmental-api-neulhenasa-el.a.run.app"
-  : "/api";
+const API_BASE_URL = "/api";
 
 const CITIES = {
   Delhi: { country: "India", code: "IN", flag: "ðŸ‡®ðŸ‡³" },

@@ -10,11 +10,17 @@ export default defineConfig({
 
     proxy: {
       "/api": {
-        target: "https://brics-environmental-api-neulhenasa-el.a.run.app",
+        target:
+          "https://brics-environmental-api-1071571669263.asia-south1.run.app",
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
+  },
+
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
   },
 });
