@@ -1146,6 +1146,263 @@ function HotspotsPage({city}){
   );
 }
 
+function ReportsPage({city}) {
+  const [submitted, setSubmitted] = useState(false);
+  const [location, setLocation] = useState("");
+  const [eventType, setEventType] = useState("SMOKE");
+  const [description, setDescription] = useState("");
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [analysis, setAnalysis] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [coords, setCoords] = useState(null);
+
+  const normalizeAnalysis = (data) => {
+    const outer = data?.analysis || data?.result || data?.data || data || {};
+    const a =
+      outer?.visual_analysis ||
+      outer?.visualAnalysis ||
+      outer?.analysis ||
+      outer;
+
+    return {
+      event_type:
+        a?.event_type ||
+        a?.eventType ||
+        a?.detected_event ||
+        a?.detectedEvent ||
+        a?.event ||
+        "UNKNOWN",
+      confidence:
+        a?.confidence ??
+        a?.ai_confidence ??
+        a?.aiConfidence ??
+        a?.confidence_score ??
+        a?.score ??
+        null,
+      scene_summary:
+        a?.scene_summary ||
+        a?.sceneSummary ||
+        a?.summary ||
+        a?.description ||
+        "",
+      environmental_signal:
+        a?.potential_environmental_signal ||
+        a?.environmental_signal ||
+        a?.environmentalSignal ||
+        a?.signal ||
+        a?.environmental_evidence ||
+        "",
+      visual_evidence:
+        Array.isArray(a?.visual_evidence)
+          ? a.visual_evidence
+          : []
+    };
+  };
+
+  const analyzePhoto = async () => {
+    if (!file) {
+      setError("Please attach a photo first.");
+      return;
+    }
+    setError("");
+    setAnalyzing(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const response = await fetch("/api/citizen/analyze-photo", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.detail || data?.message || `Gemini analysis failed: ${response.status}`);
+      }
+      const normalized = normalizeAnalysis(data);
+      setAnalysis(normalized);
+      const allowed = ["SMOKE","DUST","BURNING","INDUSTRIAL_EMISSION","HAZE","UNKNOWN"];
+      if (allowed.includes(normalized.event_type)) setEventType(normalized.event_type);
+    } catch (err) {
+      setError(err.message || "Unable to analyze the photo.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Location services are not available in this browser.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoords({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+        setLocation(`${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`);
+        setError("");
+      },
+      () => setError("Please allow location access to submit the report."),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const submitReport = async () => {
+    if (!location.trim() || !description.trim()) {
+      setError("Please provide a location and description.");
+      return;
+    }
+    if (!coords) {
+      setError("Please click 'Use my location' before submitting.");
+      return;
+    }
+    setError("");
+    setSubmitting(true);
+    try {
+      const form = new FormData();
+      form.append("city", city || "Delhi");
+      form.append("latitude", String(coords.latitude));
+      form.append("longitude", String(coords.longitude));
+      form.append("event_type", eventType);
+      form.append("description", description);
+      form.append("sensor_source", "CITIZEN_WEB_REPORT");
+      if (file) form.append("file", file);
+
+      const response = await fetch("/api/citizen/report-with-photo", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.detail || data?.message || `Report submission failed: ${response.status}`);
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message || "Unable to submit the report.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <SimplePage
+      eyebrow="CITIZEN INTELLIGENCE"
+      title="Report an Environmental Issue"
+      description="Help authorities investigate pollution events with location, description and supporting evidence."
+      icon={<AlertTriangle size={22}/>}
+    >
+      {submitted ? (
+        <div className="success-panel">
+          <CheckCircle2 size={34}/>
+          <h3>Report submitted</h3>
+          <p>Your report has been added to the demonstration incident queue.</p>
+          <button className="primary-button" onClick={() => {
+            setSubmitted(false);
+            setAnalysis(null);
+            setFile(null);
+            setPreviewUrl("");
+            setDescription("");
+            setLocation("");
+            setCoords(null);
+            setError("");
+          }}>
+            File another report
+          </button>
+        </div>
+      ) : (
+        <div className="report-form">
+          <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location or landmark"/>
+
+          <button type="button" className="upload-button" onClick={getLocation}>
+            <MapPin size={17}/> Use my location
+          </button>
+
+          <select value={eventType} onChange={(e) => setEventType(e.target.value)}>
+            <option value="SMOKE">Air pollution / smoke</option>
+            <option value="DUST">Dust pollution</option>
+            <option value="BURNING">Open burning</option>
+            <option value="INDUSTRIAL_EMISSION">Industrial emission</option>
+            <option value="HAZE">Haze / smog</option>
+            <option value="UNKNOWN">Other environmental issue</option>
+          </select>
+
+          <textarea rows="5" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe what you observed..."/>
+
+          <label className="upload-button" style={{cursor:"pointer"}}>
+            <Upload size={17}/>
+            {file ? file.name : "Attach photo"}
+            <input
+              type="file"
+              accept="image/*"
+              style={{display:"none"}}
+              onChange={(e) => {
+                const selected = e.target.files?.[0] || null;
+                setFile(selected);
+                setAnalysis(null);
+                setError("");
+                setPreviewUrl(selected ? URL.createObjectURL(selected) : "");
+              }}
+            />
+          </label>
+
+          {previewUrl && (
+            <div style={{marginTop:"12px",borderRadius:"14px",overflow:"hidden",border:"1px solid rgba(255,255,255,.12)",background:"#0d1c26"}}>
+              <img
+                src={previewUrl}
+                alt="Selected environmental evidence"
+                style={{width:"100%",maxHeight:"360px",objectFit:"contain",display:"block"}}
+              />
+            </div>
+          )}
+
+          <button type="button" className="upload-button" onClick={analyzePhoto} disabled={!file || analyzing}>
+            <Sparkles size={17}/>
+            {analyzing ? "Analyzing with Gemini..." : "Analyze Photo with Gemini"}
+          </button>
+
+          {analysis && (
+            <div className="success-panel" style={{marginTop:"12px",textAlign:"left"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
+                <Sparkles size={18}/>
+                <strong>Gemini Environmental Analysis</strong>
+              </div>
+              <p><b>Detected event:</b> {analysis.event_type}</p>
+              <p><b>Confidence:</b> {
+                typeof analysis.confidence === "number"
+                  ? `${Math.round(analysis.confidence <= 1 ? analysis.confidence * 100 : analysis.confidence)}%`
+                  : analysis.confidence || "N/A"
+              }</p>
+              {analysis.scene_summary && <p><b>Scene:</b> {analysis.scene_summary}</p>}
+              {analysis.environmental_signal && (
+                <p>
+                  <b>Environmental signal:</b> {analysis.environmental_signal}
+                </p>
+              )}
+
+              {analysis.visual_evidence?.length > 0 && (
+                <div>
+                  <p><b>Visual evidence:</b></p>
+                  <ul style={{marginTop:"6px", paddingLeft:"22px"}}>
+                    {analysis.visual_evidence.map((item, index) => (
+                      <li key={index} style={{marginBottom:"5px"}}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {error && (
+            <div className="success-panel" style={{marginTop:"12px",textAlign:"left"}}>
+              <p>{error}</p>
+            </div>
+          )}
+
+          <button className="primary-button" onClick={submitReport} disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit Environmental Complaint"}
+          </button>
+        </div>
+      )}
+    </SimplePage>
+  );
+}
+
 function AssistantPage() {
 
   const [messages, setMessages] = useState([
