@@ -10,7 +10,6 @@ import {
   Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis
 } from "recharts";
 import "./App.css";
-import GoogleHotspotMap from "./components/GoogleHotspotMap";
 
 const API_BASE_URL = "/api";
 
@@ -951,201 +950,825 @@ function Dashboard({ city, data, loading, error, online, onRefresh, t }) {
   );
 }
 
-function HotspotsPage({city}){
-  const [result,setResult]=useState(null);
-  const [loading,setLoading]=useState(true);
+function HotspotsPage({ data }) {
+  const hotspots = data?.hotspots || [];
+
+  const scores = hotspots
+    .map((h) => Number(h.hotspot_score))
+    .filter((v) => Number.isFinite(v));
+
+  const averageScore = scores.length
+    ? scores.reduce((a, b) => a + b, 0) / scores.length
+    : 0;
+
+  const highRiskCount = hotspots.filter(
+    (h) => String(h.hotspot_level).toUpperCase() === "HIGH"
+  ).length;
+
+  const latitudes = hotspots
+    .map((h) => Number(h.latitude))
+    .filter(Number.isFinite);
+
+  const longitudes = hotspots
+    .map((h) => Number(h.longitude))
+    .filter(Number.isFinite);
+
+  const latMin = latitudes.length ? Math.min(...latitudes) : 28.53;
+  const latMax = latitudes.length ? Math.max(...latitudes) : 28.71;
+  const lonMin = longitudes.length ? Math.min(...longitudes) : 77.09;
+  const lonMax = longitudes.length ? Math.max(...longitudes) : 77.29;
+
+  const positionPin = (latitude, longitude) => {
+    const latRange = Math.max(latMax - latMin, 0.001);
+    const lonRange = Math.max(lonMax - lonMin, 0.001);
+
+    const left =
+      12 + ((Number(longitude) - lonMin) / lonRange) * 76;
+
+    const top =
+      88 - ((Number(latitude) - latMin) / latRange) * 76;
+
+    return {
+      left: `${Math.min(88, Math.max(8, left))}%`,
+      top: `${Math.min(90, Math.max(8, top))}%`,
+    };
+  };
+
+  return (
+    <section className="hotspots-page">
+
+      <div className="hotspots-heading">
+        <div>
+          <span className="eyebrow">HYPERLOCAL INTELLIGENCE</span>
+
+          <h2>Pollution Hotspots</h2>
+
+          <p>
+            Estimated spatial risk derived from forecast evidence.
+            These are model estimates, not direct sensor measurements.
+          </p>
+        </div>
+
+        <div className="hotspots-heading-badge">
+          <MapPin size={18} />
+          DELHI
+        </div>
+      </div>
+
+      {/* SUMMARY STRIP */}
+
+      <div className="hotspot-summary-grid">
+
+        <div className="hotspot-summary-card">
+          <span>ACTIVE HOTSPOTS</span>
+          <strong>{hotspots.length}</strong>
+          <small>Model-identified zones</small>
+        </div>
+
+        <div className="hotspot-summary-card">
+          <span>HIGH RISK</span>
+          <strong>{highRiskCount}</strong>
+          <small>Priority monitoring zones</small>
+        </div>
+
+        <div className="hotspot-summary-card">
+          <span>AVERAGE RISK</span>
+          <strong>{averageScore.toFixed(1)}</strong>
+          <small>Spatial risk score / 100</small>
+        </div>
+
+      </div>
+
+      {/* MAP + RANKING */}
+
+      <div className="hotspots-main-grid">
+
+        <article className="hotspot-map-card">
+
+          <div className="hotspot-section-header">
+            <div>
+              <span className="eyebrow">SPATIAL RISK MODEL</span>
+              <h3>Delhi Hyperlocal View</h3>
+            </div>
+
+            <span className="model-badge">
+              <Activity size={14} />
+              MODEL ESTIMATE
+            </span>
+          </div>
+
+          <div className="hotspot-map">
+
+            <div className="map-grid-lines" />
+
+            <div className="map-zone zone-a" />
+            <div className="map-zone zone-b" />
+            <div className="map-zone zone-c" />
+
+            {hotspots.map((h) => (
+              <div
+                key={h.id}
+                className={`spatial-pin ${String(
+                  h.hotspot_level || ""
+                ).toLowerCase()}`}
+                style={positionPin(h.latitude, h.longitude)}
+                title={`${h.name} — ${formatNumber(h.hotspot_score)}/100`}
+              >
+                <span className="pin-pulse" />
+                <span className="pin-dot" />
+                <span className="pin-score">
+                  {formatNumber(h.hotspot_score)}
+                </span>
+              </div>
+            ))}
+
+            <div className="map-location-label map-label-north">
+              NORTH DELHI
+            </div>
+
+            <div className="map-location-label map-label-central">
+              CENTRAL
+            </div>
+
+            <div className="map-location-label map-label-east">
+              EAST DELHI
+            </div>
+
+            <div className="map-location-label map-label-south">
+              SOUTH
+            </div>
+
+            <div className="map-scale">
+              <span />
+              <span />
+              <span />
+              <b>Higher spatial risk →</b>
+            </div>
+
+          </div>
+
+          <div className="map-legend">
+
+            <span>
+              <i className="legend-dot high" />
+              HIGH
+            </span>
+
+            <span>
+              <i className="legend-dot moderate" />
+              MODERATE
+            </span>
+
+            <span>
+              <i className="legend-dot low" />
+              LOW
+            </span>
+
+            <span className="legend-note">
+              Scores are model estimates
+            </span>
+
+          </div>
+
+        </article>
+
+        {/* RANKED HOTSPOTS */}
+
+        <article className="hotspot-ranking-card">
+
+          <div className="hotspot-section-header">
+            <div>
+              <span className="eyebrow">PRIORITY ZONES</span>
+              <h3>Risk Ranking</h3>
+            </div>
+
+            <ShieldAlert size={21} />
+          </div>
+
+          <div className="hotspot-ranking-list">
+
+            {hotspots.length ? (
+              [...hotspots]
+                .sort(
+                  (a, b) =>
+                    Number(b.hotspot_score || 0) -
+                    Number(a.hotspot_score || 0)
+                )
+                .map((h, index) => {
+
+                  const score = Number(h.hotspot_score || 0);
+                  const level = String(
+                    h.hotspot_level || "UNKNOWN"
+                  ).toUpperCase();
+
+                  return (
+                    <div className="hotspot-ranking-item" key={h.id}>
+
+                      <div className="ranking-number">
+                        {String(index + 1).padStart(2, "0")}
+                      </div>
+
+                      <div className="ranking-main">
+
+                        <div className="ranking-title-row">
+                          <h4>{h.name}</h4>
+
+                          <span
+                            className={`risk-badge ${level.toLowerCase()}`}
+                          >
+                            {level}
+                          </span>
+                        </div>
+
+                        <div className="ranking-meta">
+                          <span>
+                            {String(
+                              h.zone_type || "ZONE"
+                            ).toUpperCase()}
+                          </span>
+
+                          <span>
+                            {h.estimated
+                              ? "MODEL ESTIMATE"
+                              : "OBSERVED"}
+                          </span>
+                        </div>
+
+                        <div className="risk-progress">
+                          <span
+                            style={{
+                              width: `${Math.min(
+                                100,
+                                Math.max(0, score)
+                              )}%`,
+                            }}
+                          />
+                        </div>
+
+                      </div>
+
+                      <div className="ranking-score">
+                        <strong>
+                          {formatNumber(score)}
+                        </strong>
+                        <small>/100</small>
+                      </div>
+
+                    </div>
+                  );
+                })
+            ) : (
+              <div className="empty-state">
+                No hotspot estimates returned by the API.
+              </div>
+            )}
+
+          </div>
+
+        </article>
+
+      </div>
+
+      {/* EVIDENCE PANEL */}
+
+      {hotspots.length > 0 && (
+        <div className="hotspot-evidence-panel">
+
+          <div className="hotspot-evidence-icon">
+            <MapPin size={20} />
+          </div>
+
+          <div>
+            <span className="eyebrow">
+              INTERPRETATION
+            </span>
+
+            <h3>
+              Spatial risk is derived from forecast evidence
+            </h3>
+
+            <p>
+              Hotspot scores combine city-level PM2.5 forecast,
+              forecast trend, meteorological/model evidence and
+              source-risk profiles. These estimates support
+              prioritization and should not be interpreted as
+              direct sensor measurements or regulatory findings.
+            </p>
+          </div>
+
+        </div>
+      )}
+
+    </section>
+  );
+}
+function IndustriesPage() {
+
+  const industryLocations = {
+    "North Delhi Industrial Corridor": {
+      latitude: 28.7041,
+      longitude: 77.1025,
+      location: "North Delhi, Delhi, India",
+      type: "Mixed Manufacturing"
+    },
+    "Wazirpur Industrial Area": {
+      latitude: 28.6863,
+      longitude: 77.1538,
+      location: "Wazirpur, Delhi, India",
+      type: "Metal & Engineering"
+    },
+    "Okhla Industrial Estate": {
+      latitude: 28.5355,
+      longitude: 77.2732,
+      location: "Okhla, New Delhi, India",
+      type: "Textile & Processing"
+    }
+  };
+
+  return (
+    <section className="industries-page">
+
+      <div className="industries-heading">
+        <div>
+          <span className="eyebrow">SOURCE INTELLIGENCE</span>
+
+          <h2>Industrial Environmental Intelligence</h2>
+
+          <p>
+            Monitor nearby industrial zones, their exact locations,
+            industry classifications and environmental monitoring status.
+          </p>
+        </div>
+
+        <div className="industry-heading-badge">
+          <Building2 size={18} />
+          INDUSTRIAL NETWORK
+        </div>
+      </div>
+
+
+      <div className="industry-summary-grid">
+
+        <div className="industry-summary-card">
+          <span>MONITORED INDUSTRIES</span>
+          <strong>{INDUSTRIES.length}</strong>
+          <small>Nearby industrial zones</small>
+        </div>
+
+        <div className="industry-summary-card">
+          <span>SENSOR CONNECTIVITY</span>
+          <strong>
+            {
+              INDUSTRIES.filter(
+                i => String(i.sensor).toUpperCase() === "ONLINE"
+              ).length
+            }/{INDUSTRIES.length}
+          </strong>
+          <small>Monitoring nodes online</small>
+        </div>
+
+        <div className="industry-summary-card attention">
+          <span>AREAS REQUIRING ATTENTION</span>
+          <strong>
+            {
+              INDUSTRIES.filter(
+                i => !String(i.status).toLowerCase().includes("normal")
+              ).length
+            }
+          </strong>
+          <small>Observation or elevated monitoring</small>
+        </div>
+
+      </div>
+
+
+      <div className="industry-section-header">
+
+        <div>
+          <span className="eyebrow">INDUSTRIAL SOURCE AREAS</span>
+          <h3>Nearby Industrial Locations</h3>
+        </div>
+
+        <span className="industry-count">
+          {INDUSTRIES.length} ZONES
+        </span>
+
+      </div>
+
+
+      <div className="industry-grid">
+
+        {INDUSTRIES.map((industry, index) => {
+
+          const info = industryLocations[industry.name];
+
+          const status =
+            String(industry.status).toLowerCase();
+
+          const statusClass =
+            status.includes("normal")
+              ? "normal"
+              : status.includes("observation") ||
+                status.includes("watch")
+              ? "watch"
+              : "alert";
+
+          const priority =
+            statusClass === "normal"
+              ? "ROUTINE"
+              : statusClass === "watch"
+              ? "ELEVATED"
+              : "HIGH";
+
+          return (
+
+            <article
+              className={`industrial-card ${statusClass}`}
+              key={industry.name}
+            >
+
+              <div className="industrial-card-top">
+
+                <div className="industrial-number">
+                  {String(index + 1).padStart(2, "0")}
+                </div>
+
+                <div className="industrial-icon">
+                  <Building2 size={21} />
+                </div>
+
+                <span className={`industry-status-badge ${statusClass}`}>
+                  {String(industry.status).toUpperCase()}
+                </span>
+
+              </div>
+
+
+              <div className="industrial-card-body">
+
+                <span className="industrial-eyebrow">
+                  INDUSTRIAL SOURCE AREA
+                </span>
+
+                <h3>{industry.name}</h3>
+
+                <p className="industrial-type">
+                  {info?.type || industry.type}
+                </p>
+
+              </div>
+
+
+              <div className="industry-location-box">
+
+                <div className="industry-location-icon">
+                  <MapPin size={16} />
+                </div>
+
+                <div>
+
+                  <span>EXACT LOCATION</span>
+
+                  <strong>
+                    {info?.location || "Location unavailable"}
+                  </strong>
+
+                  {info && (
+                    <small>
+                      {info.latitude.toFixed(4)}° N,{" "}
+                      {info.longitude.toFixed(4)}° E
+                    </small>
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div className="industrial-metrics">
+
+                <div className="industrial-metric">
+                  <span>DISTANCE</span>
+                  <strong>{industry.distance}</strong>
+                </div>
+
+                <div className="industrial-metric">
+                  <span>SENSOR</span>
+
+                  <strong
+                    className={
+                      String(industry.sensor).toUpperCase() === "ONLINE"
+                        ? "sensor-online"
+                        : "sensor-offline"
+                    }
+                  >
+                    <i />
+                    {industry.sensor}
+                  </strong>
+                </div>
+
+              </div>
+
+
+              <div className="industry-type-row">
+
+                <div>
+                  <span>INDUSTRY CLASSIFICATION</span>
+                  <strong>
+                    {info?.type || industry.type}
+                  </strong>
+                </div>
+
+                <Building2 size={17} />
+
+              </div>
+
+
+              <div className="industrial-monitoring">
+
+                <div className="monitoring-label">
+                  <span>MONITORING PRIORITY</span>
+                  <strong>{priority}</strong>
+                </div>
+
+                <div className="monitoring-track">
+
+                  <span
+                    className={statusClass}
+                    style={{
+                      width:
+                        statusClass === "normal"
+                          ? "38%"
+                          : statusClass === "watch"
+                          ? "68%"
+                          : "90%"
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+
+              <div className="industrial-footer">
+
+                <span>
+                  <Radio size={13} />
+                  Environmental monitoring node
+                </span>
+
+                {info && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${info.latitude},${info.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="view-location-button"
+                  >
+                    <MapPin size={13} />
+                    View Location
+                  </a>
+                )}
+
+              </div>
+
+            </article>
+
+          );
+
+        })}
+
+      </div>
+
+
+      <div className="industry-context-panel">
+
+        <div className="industry-context-icon">
+          <ShieldAlert size={20} />
+        </div>
+
+        <div>
+
+          <span className="eyebrow">INTERPRETATION</span>
+
+          <h3>
+            Industrial proximity supports source prioritization
+          </h3>
+
+          <p>
+            Industrial zones are displayed as potential source-risk
+            areas using location and monitoring context. This information
+            does not by itself establish regulatory non-compliance.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+  );
+}
+
+function ReportsPage(){
+  const [submitted,setSubmitted]=useState(false);
+  const [file,setFile]=useState(null);
+  const [preview,setPreview]=useState("");
+  const [analysis,setAnalysis]=useState(null);
+  const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
 
-  const loadHotspots=async()=>{
+  const handleFileChange=(e)=>{
+    const selected=e.target.files?.[0];
+    if(!selected)return;
+    setFile(selected);
+    setPreview(URL.createObjectURL(selected));
+    setAnalysis(null);
+    setError("");
+  };
+
+  const analyzePhoto=async()=>{
+    if(!file){
+      setError("Please attach an image first.");
+      return;
+    }
+
     setLoading(true);
     setError("");
+    setAnalysis(null);
 
     try{
-      const response=await fetch(`${API_BASE_URL}/hotspots/${encodeURIComponent(city)}`);
-      const payload=await response.json();
+      const formData=new FormData();
+      formData.append("file",file);
+
+      const response=await fetch(`${API_BASE_URL}/citizen/analyze-photo`,{
+        method:"POST",
+        body:formData
+      });
+
+      const data=await response.json();
 
       if(!response.ok){
-        throw new Error(payload?.detail || "Unable to load hotspot intelligence.");
+        throw new Error(
+          data?.detail?.[0]?.msg ||
+          data?.detail ||
+          "Photo analysis failed."
+        );
       }
 
-      setResult(payload?.data || null);
+      setAnalysis(data.analysis);
     }catch(err){
-      setError(err?.message || "Unable to load hotspot intelligence.");
+      setError(err?.message || "Unable to analyze the image.");
     }finally{
       setLoading(false);
     }
   };
 
-  useEffect(()=>{
-    if(city)loadHotspots();
-  },[city]);
-
-  const hotspots=result?.hotspots || [];
-  const summary=result?.fusion_summary || {};
-
-  const levelClass=(level)=>{
-    const value=String(level || "MONITORING").toLowerCase().replace(/\\s+/g,"-");
-    return `hotspot-card ${value}`;
+  const resetReport=()=>{
+    setSubmitted(false);
+    setFile(null);
+    setPreview("");
+    setAnalysis(null);
+    setError("");
   };
 
   return (
     <SimplePage
-      eyebrow="MULTIMODAL HYPERLOCAL INTELLIGENCE"
-      title="Pollution Hotspots"
-      description="AI-fused environmental signals combining ML forecasts, citizen observations, Gemini Vision evidence and atmospheric context."
-      icon={<MapPin size={22}/>}>
+      eyebrow="CITIZEN INTELLIGENCE"
+      title="Report an Environmental Issue"
+      description="Help authorities investigate pollution events with location, description and AI-powered visual evidence."
+      icon={<AlertTriangle size={22}/>}>
 
-      {loading ? (
-        <div className="empty-state">
-          Loading multimodal hotspot intelligence...
-        </div>
-      ) : error ? (
-        <div className="empty-state">
-          <strong>Hotspot intelligence unavailable</strong>
-          <p>{error}</p>
-          <button className="primary-button" onClick={loadHotspots}>
-            <RefreshCw size={17}/> Retry
+      {submitted ? (
+        <div className="success-panel">
+          <CheckCircle2 size={34}/>
+          <h3>Report submitted</h3>
+          <p>Your environmental observation has been added to the demonstration incident queue with AI evidence.</p>
+          <button className="primary-button" onClick={resetReport}>
+            File another report
           </button>
         </div>
       ) : (
-        <>
-          <div
-            style={{
-              width: "100%",
-              height: "520px",
-              marginBottom: "20px",
-              borderRadius: "18px",
-              overflow: "hidden",
-            }}
-          >
-            <GoogleHotspotMap
-              hotspots={hotspots}
-              city={city}
+        <div className="report-form">
+
+          <input placeholder="Location or landmark" />
+
+          <select>
+            <option>Air pollution / smoke</option>
+            <option>Untreated waste discharge</option>
+            <option>Illegal dumping</option>
+            <option>Industrial emission</option>
+            <option>Dust / construction pollution</option>
+            <option>Other environmental issue</option>
+          </select>
+
+          <textarea
+            rows="5"
+            placeholder="Describe what you observed..."
+          />
+
+          <label className="upload-button">
+            <Upload size={17}/>
+            {file ? file.name : "Attach photo"}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              style={{display:"none"}}
             />
-          </div>
+          </label>
 
-          <div style={{
-            display:"grid",
-            gridTemplateColumns:"repeat(3,minmax(0,1fr))",
-            gap:"12px",
-            marginBottom:"18px"
-          }}>
-            <div className="sensor-card">
-              <span>Citizen reports</span>
-              <strong>{result?.citizen_report_count ?? 0}</strong>
-              <small>{result?.matched_citizen_report_count ?? 0} matched to hotspots</small>
-            </div>
+          {preview && (
+            <div style={{marginTop:"14px",display:"flex",flexDirection:"column",gap:"10px"}}>
+              <img
+                src={preview}
+                alt="Environmental evidence preview"
+                style={{width:"100%",maxHeight:"280px",objectFit:"cover",borderRadius:"12px"}}
+              />
 
-            <div className="sensor-card">
-              <span>Fusion sources</span>
-              <strong>{summary?.evidence_sources?.length || 4}</strong>
-              <small>ML + citizen + Gemini + atmosphere</small>
-            </div>
-
-            <div className="sensor-card">
-              <span>Matching radius</span>
-              <strong>{summary?.matching_radius_km ?? 5} km</strong>
-              <small>Geospatial evidence matching</small>
-            </div>
-          </div>
-
-          {hotspots.length ? (
-            <div className="hotspot-page-grid">
-              {hotspots.map((h)=>(
-                <div className={levelClass(h.fused_level)} key={h.id}>
-                  <span className="eyebrow">
-                    {String(h.zone_type || "ZONE").toUpperCase()}
-                  </span>
-
-                  <h3>{h.name}</h3>
-
-                  <div style={{display:"flex",alignItems:"baseline",gap:"6px",margin:"8px 0"}}>
-                    <strong style={{fontSize:"32px"}}>
-                      {Number(h.fused_hotspot_score ?? h.hotspot_score ?? 0).toFixed(1)}
-                    </strong>
-                    <small>/100 fused</small>
-                  </div>
-
-                  <span>
-                    {String(h.fused_level || "MONITORING")} • {h.estimated ? "MODEL + EVIDENCE" : "OBSERVED"}
-                  </span>
-
-                  <div style={{marginTop:"16px",display:"grid",gap:"8px"}}>
-                    <div style={{display:"flex",justifyContent:"space-between"}}>
-                      <span>ML model</span>
-                      <strong>{Number(h.model_hotspot_score || 0).toFixed(1)}</strong>
-                    </div>
-
-                    <div style={{display:"flex",justifyContent:"space-between"}}>
-                      <span>Citizen evidence</span>
-                      <strong>{Number(h.citizen_evidence_score || 0).toFixed(1)}</strong>
-                    </div>
-
-                    <div style={{display:"flex",justifyContent:"space-between"}}>
-                      <span>Atmospheric</span>
-                      <strong>{Number(h.atmospheric_evidence_score || 0).toFixed(1)}</strong>
-                    </div>
-
-                    <div style={{display:"flex",justifyContent:"space-between"}}>
-                      <span>Nearby reports</span>
-                      <strong>{h.citizen_reports_nearby || 0}</strong>
-                    </div>
-                  </div>
-
-                  {h.citizen_evidence?.length > 0 && (
-                    <div style={{
-                      marginTop:"16px",
-                      padding:"12px",
-                      borderRadius:"10px",
-                      border:"1px solid rgba(255,255,255,0.10)"
-                    }}>
-                      <div style={{display:"flex",alignItems:"center",gap:"7px",marginBottom:"8px"}}>
-                        <Sparkles size={16}/>
-                        <strong>Gemini / Citizen Evidence</strong>
-                      </div>
-
-                      {h.citizen_evidence.slice(0,2).map((e,index)=>(
-                        <div key={e.report_id || index} style={{marginBottom:"8px"}}>
-                          <div>
-                            <strong>{e.visual_ai?.event_type || e.event_type || "UNKNOWN"}</strong>
-                            {e.visual_ai?.confidence != null && (
-                              <span> • {Math.round(Number(e.visual_ai.confidence)*100)}% AI confidence</span>
-                            )}
-                          </div>
-
-                          {e.visual_ai?.potential_environmental_signal && (
-                            <small>{e.visual_ai.potential_environmental_signal}</small>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {h.atmospheric_evidence?.evidence && (
-                    <div style={{marginTop:"12px"}}>
-                      <small>
-                        Atmospheric: AOD {Number(h.atmospheric_evidence.evidence.aerosol_optical_depth || 0).toFixed(2)} • PM2.5 {Number(h.atmospheric_evidence.evidence.pm25_context || 0).toFixed(1)}
-                      </small>
-                    </div>
-                  )}
-
-                  <div style={{marginTop:"12px"}}>
-                    <small>{h.fusion_method}</small>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              No fused hotspot intelligence returned for {city}.
+              <button
+                type="button"
+                className="upload-button"
+                onClick={analyzePhoto}
+                disabled={loading}
+              >
+                <Bot size={17}/>
+                {loading ? "Analyzing with Gemini..." : "Analyze Photo with AI"}
+              </button>
             </div>
           )}
-        </>
+
+          {error && (
+            <div style={{marginTop:"12px",padding:"12px",borderRadius:"10px"}}>
+              <strong>Analysis error:</strong> {error}
+            </div>
+          )}
+
+          {analysis && (
+            <div style={{marginTop:"18px",padding:"18px",borderRadius:"14px",border:"1px solid rgba(255,255,255,0.10)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"12px"}}>
+                <Sparkles size={18}/>
+                <strong>AI Environmental Evidence</strong>
+              </div>
+
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px",marginBottom:"14px"}}>
+                <div>
+                  <small>Event Type</small>
+                  <div>
+                    <strong>{analysis.visual_analysis?.event_type || "UNKNOWN"}</strong>
+                  </div>
+                </div>
+
+                <div>
+                  <small>Confidence</small>
+                  <div>
+                    <strong>
+                      {analysis.visual_analysis?.confidence != null
+                        ? `${Math.round(analysis.visual_analysis.confidence*100)}%`
+                        : "N/A"}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              <p>
+                {analysis.visual_analysis?.scene_summary || "No scene summary returned."}
+              </p>
+
+              {analysis.visual_analysis?.potential_environmental_signal && (
+                <p>
+                  <strong>Environmental signal:</strong>{" "}
+                  {analysis.visual_analysis.potential_environmental_signal}
+                </p>
+              )}
+
+              {analysis.visual_analysis?.visual_evidence?.length > 0 && (
+                <div>
+                  <strong>Visual evidence</strong>
+                  <ul>
+                    {analysis.visual_analysis.visual_evidence.map((item,index)=>(
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="primary-button"
+            onClick={()=>setSubmitted(true)}
+          >
+            <Send size={17}/>
+            Submit Environmental Complaint
+          </button>
+
+        </div>
       )}
     </SimplePage>
   );
 }
 
+function SensorsPage(){return <SimplePage eyebrow="INDUSTRIAL SENSOR NETWORK" title="Environmental Sensors" description="Prototype sensor view. Simulated streams are explicitly labelled and must not be presented as verified industrial telemetry." icon={<Radio size={22}/>}><div className="sensor-banner"><span className="status-dot online-dot"/><b>DEMO SENSOR STREAM</b><span>Simulated industrial-zone telemetry</span></div><div className="sensor-grid">{SENSOR_DATA.map(([name,value,unit,status])=><div className="sensor-card" key={name}><span>{name}</span><strong>{value} <small>{unit}</small></strong><b className={`sensor-status ${status.toLowerCase()}`}>{status}</b></div>)}</div></SimplePage>}
 function AssistantPage() {
 
   const [messages, setMessages] = useState([
@@ -1861,7 +2484,7 @@ function App(){
 </option>)}</select><ChevronDown size={15}/></div><button className="icon-button" title="Toggle theme" onClick={()=>setTheme(theme==="dark"?"light":"dark")}>{theme==="dark"?<Sun size={18}/>:<Moon size={18}/>}</button><select className="language-select" value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option value="en">EN</option><option value="hi">à¤¹à¤¿</option><option value="od">à¬“</option></select><button className="refresh-button" onClick={refresh} disabled={refreshing}><RefreshCw size={17} className={refreshing?"spin":""}/>{t.refresh}</button></div></header>
       <main className="dashboard">
         {page==="dashboard"&&<Dashboard city={city} data={data} loading={loading} error={error} online={online} onRefresh={refresh} t={t}/>}
-        {page==="hotspots"&&<HotspotsPage city={city}/>} {page==="industries"&&<IndustriesPage/>}
+        {page==="hotspots"&&<HotspotsPage data={data}/>} {page==="industries"&&<IndustriesPage/>}
         {page==="reports"&&<ReportsPage/>} {page==="sensors"&&<SensorsPage/>}
         {page==="assistant"&&<AssistantPage/>} {page==="network"&&<NetworkPage/>}
         {page==="settings"&&<SettingsPage theme={theme} setTheme={setTheme} language={language} setLanguage={setLanguage} t={t}/>}
