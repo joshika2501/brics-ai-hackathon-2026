@@ -5899,3 +5899,19 @@ body{min-width:320px}button,input,select,textarea{font:inherit}button{cursor:poi
   }
 
 }
+/* VAYUNET header alignment */
+.brand-text {
+  min-width: 0;
+}
+
+.brand-text h1 {
+  margin: 0;
+  white-space: nowrap;
+  line-height: 1.05;
+}
+
+.brand-text p {
+  margin: 6px 0 0;
+  white-space: nowrap;
+  line-height: 1.2;
+}
