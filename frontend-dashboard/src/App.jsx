@@ -22,9 +22,9 @@ const CITIES = {
 };
 
 const TRANSLATIONS = {
-  en: { dashboard:"Dashboard", hotspots:"Hotspots", industries:"Industries", reports:"Citizen Reports", sensors:"Sensors", assistant:"AI Assistant", network:"BRICS Network", settings:"Settings", current:"Current PM2.5", forecast:"Forecast +6h", risk:"Risk Level", trend:"Trend", live:"LIVE", offline:"OFFLINE", refresh:"Refresh", predict:"Predict", explain:"Explain", decide:"Decide", selectCity:"Select city", signIn:"Sign In", email:"Email", password:"Password", continueDemo:"Continue as Demo User" },
-  hi: { dashboard:"à¤¡à¥ˆà¤¶à¤¬à¥‹à¤°à¥à¤¡", hotspots:"à¤ªà¥à¤°à¤¦à¥‚à¤·à¤£ à¤¹à¥‰à¤Ÿà¤¸à¥à¤ªà¥‰à¤Ÿ", industries:"à¤‰à¤¦à¥à¤¯à¥‹à¤—", reports:"à¤¨à¤¾à¤—à¤°à¤¿à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤à¥‡à¤‚", sensors:"à¤¸à¥‡à¤‚à¤¸à¤°", assistant:"AI à¤¸à¤¹à¤¾à¤¯à¤•", network:"BRICS à¤¨à¥‡à¤Ÿà¤µà¤°à¥à¤•", settings:"à¤¸à¥‡à¤Ÿà¤¿à¤‚à¤—à¥à¤¸", current:"à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ PM2.5", forecast:"6 à¤˜à¤‚à¤Ÿà¥‡ à¤•à¤¾ à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨", risk:"à¤œà¥‹à¤–à¤¿à¤® à¤¸à¥à¤¤à¤°", trend:"à¤°à¥à¤à¤¾à¤¨", live:"à¤²à¤¾à¤‡à¤µ", offline:"à¤‘à¤«à¤²à¤¾à¤‡à¤¨", refresh:"à¤°à¤¿à¤«à¥à¤°à¥‡à¤¶", predict:"à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨", explain:"à¤µà¥à¤¯à¤¾à¤–à¥à¤¯à¤¾", decide:"à¤¨à¤¿à¤°à¥à¤£à¤¯", selectCity:"à¤¶à¤¹à¤° à¤šà¥à¤¨à¥‡à¤‚", signIn:"à¤¸à¤¾à¤‡à¤¨ à¤‡à¤¨", email:"à¤ˆà¤®à¥‡à¤²", password:"à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡", continueDemo:"à¤¡à¥‡à¤®à¥‹ à¤¯à¥‚à¤œà¤¼à¤° à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚" },
-  od: { dashboard:"à¬¡à­à­Ÿà¬¾à¬¸à¬¬à­‹à¬°à­à¬¡", hotspots:"à¬ªà­à¬°à¬¦à­‚à¬·à¬£ à¬¹à¬Ÿà¬¸à­à¬ªà¬Ÿ", industries:"à¬¶à¬¿à¬³à­à¬ª", reports:"à¬¨à¬¾à¬—à¬°à¬¿à¬• à¬…à¬­à¬¿à¬¯à­‹à¬—", sensors:"à¬¸à­‡à¬¨à­à¬¸à¬°", assistant:"AI à¬¸à¬¹à¬¾à­Ÿà¬•", network:"BRICS à¬¨à­‡à¬Ÿà­±à¬°à­à¬•", settings:"à¬¸à­‡à¬Ÿà¬¿à¬‚à¬¸à­", current:"à¬¬à¬°à­à¬¤à­à¬¤à¬®à¬¾à¬¨ PM2.5", forecast:"6 à¬˜à¬£à­à¬Ÿà¬¿à¬† à¬ªà­‚à¬°à­à¬¬à¬¾à¬¨à­à¬®à¬¾à¬¨", risk:"à¬¬à¬¿à¬ªà¬¦ à¬¸à­à¬¤à¬°", trend:"à¬ªà­à¬°à¬¬à­ƒà¬¤à­à¬¤à¬¿", live:"à¬²à¬¾à¬‡à¬­à­", offline:"à¬…à¬«à¬²à¬¾à¬‡à¬¨à­", refresh:"à¬°à¬¿à¬«à­à¬°à­‡à¬¶", predict:"à¬ªà­‚à¬°à­à¬¬à¬¾à¬¨à­à¬®à¬¾à¬¨", explain:"à¬¬à­à­Ÿà¬¾à¬–à­à­Ÿà¬¾", decide:"à¬¨à¬¿à¬·à­à¬ªà¬¤à­à¬¤à¬¿", selectCity:"à¬¸à¬¹à¬° à¬¬à¬¾à¬›à¬¨à­à¬¤à­", signIn:"à¬¸à¬¾à¬‡à¬¨à­ à¬‡à¬¨à­", email:"à¬‡à¬®à­‡à¬²à­", password:"à¬ªà¬¾à¬¸à­±à¬¾à¬°à­à¬¡", continueDemo:"à¬¡à­‡à¬®à­‹ à­Ÿà­à¬œà¬° à¬­à¬¾à¬¬à­‡ à¬œà¬¾à¬°à¬¿ à¬°à¬–à¬¨à­à¬¤à­" }
+  en: { dashboard:"Dashboard", hotspots:"Hotspots", industries:"Industries", reports:"Citizen Reports", sensors:"Sensors", assistant:"AI Assistant", network:"India Environmental Network", settings:"Settings", current:"Current PM2.5", forecast:"Forecast +6h", risk:"Risk Level", trend:"Trend", live:"LIVE", offline:"OFFLINE", refresh:"Refresh", predict:"Predict", explain:"Explain", decide:"Decide", selectCity:"Select city", signIn:"Sign In", email:"Email", password:"Password", continueDemo:"Continue as Demo User" },
+  hi: { dashboard:"à¤¡à¥ˆà¤¶à¤¬à¥‹à¤°à¥à¤¡", hotspots:"à¤ªà¥à¤°à¤¦à¥‚à¤·à¤£ à¤¹à¥‰à¤Ÿà¤¸à¥à¤ªà¥‰à¤Ÿ", industries:"à¤‰à¤¦à¥à¤¯à¥‹à¤—", reports:"à¤¨à¤¾à¤—à¤°à¤¿à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤à¥‡à¤‚", sensors:"à¤¸à¥‡à¤‚à¤¸à¤°", assistant:"AI à¤¸à¤¹à¤¾à¤¯à¤•", network:"India à¤¨à¥‡à¤Ÿà¤µà¤°à¥à¤•", settings:"à¤¸à¥‡à¤Ÿà¤¿à¤‚à¤—à¥à¤¸", current:"à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ PM2.5", forecast:"6 à¤˜à¤‚à¤Ÿà¥‡ à¤•à¤¾ à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨", risk:"à¤œà¥‹à¤–à¤¿à¤® à¤¸à¥à¤¤à¤°", trend:"à¤°à¥à¤à¤¾à¤¨", live:"à¤²à¤¾à¤‡à¤µ", offline:"à¤‘à¤«à¤²à¤¾à¤‡à¤¨", refresh:"à¤°à¤¿à¤«à¥à¤°à¥‡à¤¶", predict:"à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨", explain:"à¤µà¥à¤¯à¤¾à¤–à¥à¤¯à¤¾", decide:"à¤¨à¤¿à¤°à¥à¤£à¤¯", selectCity:"à¤¶à¤¹à¤° à¤šà¥à¤¨à¥‡à¤‚", signIn:"à¤¸à¤¾à¤‡à¤¨ à¤‡à¤¨", email:"à¤ˆà¤®à¥‡à¤²", password:"à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡", continueDemo:"à¤¡à¥‡à¤®à¥‹ à¤¯à¥‚à¤œà¤¼à¤° à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤œà¤¾à¤°à¥€ à¤°à¤–à¥‡à¤‚" },
+  od: { dashboard:"à¬¡à­à­Ÿà¬¾à¬¸à¬¬à­‹à¬°à­à¬¡", hotspots:"à¬ªà­à¬°à¬¦à­‚à¬·à¬£ à¬¹à¬Ÿà¬¸à­à¬ªà¬Ÿ", industries:"à¬¶à¬¿à¬³à­à¬ª", reports:"à¬¨à¬¾à¬—à¬°à¬¿à¬• à¬…à¬­à¬¿à¬¯à­‹à¬—", sensors:"à¬¸à­‡à¬¨à­à¬¸à¬°", assistant:"AI à¬¸à¬¹à¬¾à­Ÿà¬•", network:"India à¬¨à­‡à¬Ÿà­±à¬°à­à¬•", settings:"à¬¸à­‡à¬Ÿà¬¿à¬‚à¬¸à­", current:"à¬¬à¬°à­à¬¤à­à¬¤à¬®à¬¾à¬¨ PM2.5", forecast:"6 à¬˜à¬£à­à¬Ÿà¬¿à¬† à¬ªà­‚à¬°à­à¬¬à¬¾à¬¨à­à¬®à¬¾à¬¨", risk:"à¬¬à¬¿à¬ªà¬¦ à¬¸à­à¬¤à¬°", trend:"à¬ªà­à¬°à¬¬à­ƒà¬¤à­à¬¤à¬¿", live:"à¬²à¬¾à¬‡à¬­à­", offline:"à¬…à¬«à¬²à¬¾à¬‡à¬¨à­", refresh:"à¬°à¬¿à¬«à­à¬°à­‡à¬¶", predict:"à¬ªà­‚à¬°à­à¬¬à¬¾à¬¨à­à¬®à¬¾à¬¨", explain:"à¬¬à­à­Ÿà¬¾à¬–à­à­Ÿà¬¾", decide:"à¬¨à¬¿à¬·à­à¬ªà¬¤à­à¬¤à¬¿", selectCity:"à¬¸à¬¹à¬° à¬¬à¬¾à¬›à¬¨à­à¬¤à­", signIn:"à¬¸à¬¾à¬‡à¬¨à­ à¬‡à¬¨à­", email:"à¬‡à¬®à­‡à¬²à­", password:"à¬ªà¬¾à¬¸à­±à¬¾à¬°à­à¬¡", continueDemo:"à¬¡à­‡à¬®à­‹ à­Ÿà­à¬œà¬° à¬­à¬¾à¬¬à­‡ à¬œà¬¾à¬°à¬¿ à¬°à¬–à¬¨à­à¬¤à­" }
 };
 
 const NAV_ITEMS = [
@@ -88,14 +88,14 @@ function Login({onLogin,t}) {
 
           <div className="login-logo">
             <img
-              src="/brics-logo.svg"
-              alt="BRICS India 2026"
+              src="/vayunet-logo.png"
+              alt="VAYUNET — Environmental Intelligence for India"
             />
           </div>
 
           <div className="login-brand-text">
             <h1>
-              BRICS <span>EcoSphere</span>
+              VAYUNET <span>Environmental Intelligence</span>
             </h1>
 
             <p>
@@ -106,7 +106,7 @@ function Login({onLogin,t}) {
         </div>
 
         <div className="login-kicker">
-          BRICS 2026 • ENVIRONMENTAL INTELLIGENCE
+          ENVIRONMENTAL INTELLIGENCE FOR INDIA
         </div>
 
         <h2 className="login-title">
@@ -866,7 +866,7 @@ function Dashboard({ city, data, loading, error, online, onRefresh, t }) {
             </span>
 
             <h3>
-              BRICS Regulatory Context
+              India Regulatory Context
             </h3>
 
             <p>
@@ -1819,7 +1819,7 @@ function AssistantPage() {
     {
       role: "assistant",
       text:
-        "Hi! I'm the BRICS Environmental Intelligence Assistant. I can help you understand air quality, PM2.5 forecasts, environmental risk, pollution drivers, hotspots, industries, sensors and recommended actions."
+        "Hi! I'm the VAYUNET Environmental Intelligence Assistant. I can help you understand air quality, PM2.5 forecasts, environmental risk, pollution drivers, hotspots, industries, sensors and recommended actions."
     }
   ]);
 
@@ -1898,7 +1898,7 @@ function AssistantPage() {
     if (!isEnvironmental) {
       return {
         text:
-          "I'm the BRICS Environmental Intelligence Assistant. I can only help with environmental topics such as air quality, PM2.5, pollution forecasts, environmental risk, hotspots, industrial sources, sensors, health precautions and citizen reporting."
+          "I'm the VAYUNET Environmental Intelligence Assistant. I can only help with environmental topics such as air quality, PM2.5, pollution forecasts, environmental risk, hotspots, industrial sources, sensors, health precautions and citizen reporting."
       };
     }
 
@@ -2717,9 +2717,9 @@ function App(){
   if(!loggedIn)return <Login onLogin={login} t={t}/>;
   const page=route||"dashboard";
   return <div className="app-shell">
-    <aside className={`sidebar ${sidebarOpen?"open":""}`}><div className="sidebar-brand"><div className="logo-placeholder"><img src="/assets/brics-india-2026.svg" alt="BRICS India 2026" /></div><div><b>BRICS EcoSphere</b><span>Environmental Intelligence</span></div><button className="mobile-close" onClick={()=>setSidebarOpen(false)}><X size={18}/></button></div><nav>{NAV_ITEMS.map(([key,label,Icon])=><button className={page===key?"nav-item active":"nav-item"} key={key} onClick={()=>{navigate(key);setSidebarOpen(false)}}><Icon size={18}/><span>{t[label]}</span></button>)}</nav><div className="sidebar-bottom"><button className={page==="settings"?"nav-item active":"nav-item"} onClick={()=>navigate("settings")}><Settings size={18}/><span>{t.settings}</span></button><button className="nav-item" onClick={logout}><LogOut size={18}/><span>Logout</span></button></div></aside>
+    <aside className={`sidebar ${sidebarOpen?"open":""}`}><div className="sidebar-brand"><div className="logo-placeholder"><img src="/vayunet-logo.png" alt="VAYUNET — Environmental Intelligence for India" /></div><div><b>VAYUNET</b><span>Environmental Intelligence</span></div><button className="mobile-close" onClick={()=>setSidebarOpen(false)}><X size={18}/></button></div><nav>{NAV_ITEMS.map(([key,label,Icon])=><button className={page===key?"nav-item active":"nav-item"} key={key} onClick={()=>{navigate(key);setSidebarOpen(false)}}><Icon size={18}/><span>{t[label]}</span></button>)}</nav><div className="sidebar-bottom"><button className={page==="settings"?"nav-item active":"nav-item"} onClick={()=>navigate("settings")}><Settings size={18}/><span>{t.settings}</span></button><button className="nav-item" onClick={logout}><LogOut size={18}/><span>Logout</span></button></div></aside>
     {sidebarOpen&&<button className="sidebar-overlay" onClick={()=>setSidebarOpen(false)} aria-label="Close navigation"/>}
-    <div className="main-shell"><header className="topbar"><button className="menu-button" onClick={()=>setSidebarOpen(true)}><Menu size={21}/></button><div className="brand"><div className="brand-icon"><img src="/assets/brics-india-2026.svg" alt="BRICS India 2026" /><span className="live-dot"/></div><div><h1>BRICS <span>EcoSphere</span></h1><p>Predictive Environmental Intelligence</p></div></div><div className="header-actions"><div className={`connection ${online || data ? "online" : "offline"}`}>
+    <div className="main-shell"><header className="topbar"><button className="menu-button" onClick={()=>setSidebarOpen(true)}><Menu size={21}/></button><div className="brand"><div className="brand-icon"><img src="/vayunet-logo.png" alt="VAYUNET — Environmental Intelligence for India" /><span className="live-dot"/></div><div><h1>VAYUNET <span>Environmental Intelligence</span></h1><p>Predictive Environmental Intelligence</p></div></div><div className="header-actions"><div className={`connection ${online || data ? "online" : "offline"}`}>
   <span className="status-dot"/>
   <Activity size={16}/>
   {online || data ? t.live : t.offline}
