@@ -2719,7 +2719,7 @@ function App(){
   return <div className="app-shell">
     <aside className={`sidebar ${sidebarOpen?"open":""}`}><div className="sidebar-brand"><div className="logo-placeholder"><img src="/vayunet-logo.png" alt="VAYUNET — Environmental Intelligence for India" /></div><div>
   <b>VAYUNET</b>
-  <span>Environmental Intelligence for India</span>
+  <span>Environmental Intelligence</span>
 </div><button className="mobile-close" onClick={()=>setSidebarOpen(false)}><X size={18}/></button></div><nav>{NAV_ITEMS.map(([key,label,Icon])=><button className={page===key?"nav-item active":"nav-item"} key={key} onClick={()=>{navigate(key);setSidebarOpen(false)}}><Icon size={18}/><span>{t[label]}</span></button>)}</nav><div className="sidebar-bottom"><button className={page==="settings"?"nav-item active":"nav-item"} onClick={()=>navigate("settings")}><Settings size={18}/><span>{t.settings}</span></button><button className="nav-item" onClick={logout}><LogOut size={18}/><span>Logout</span></button></div></aside>
     {sidebarOpen&&<button className="sidebar-overlay" onClick={()=>setSidebarOpen(false)} aria-label="Close navigation"/>}
     <div className="main-shell"><header className="topbar"><button className="menu-button" onClick={()=>setSidebarOpen(true)}><Menu size={21}/></button><div className="brand"><div className="brand-icon"><img src="/vayunet-logo.png" alt="VAYUNET — Environmental Intelligence for India" /><span className="live-dot"/></div><div className="brand-text">
