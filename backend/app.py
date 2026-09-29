@@ -15,6 +15,7 @@ from backend.services.hotspot_fusion import fuse_hotspots
 from backend.services.authority_alerts import generate_authority_alerts
 from backend.services.citizen_vision import analyze_environmental_photo
 from backend.services.satellite_intelligence import get_satellite_evidence
+from backend.services.industry_environment import get_industry_environment
 
 app = FastAPI(
     title="BRICS Environmental Intelligence",
@@ -366,6 +367,11 @@ def satellite_intelligence(city: str):
             city=city,
         ),
     }
+
+@app.get("/industry/environment")
+async def industry_environment(city: str, lat: float, lng: float, industry_name: str = ""):
+    return get_industry_environment(city, lat, lng, industry_name)
+
 
 @app.get("/alerts/{city}")
 def authority_alerts(city: str):

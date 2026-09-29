@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Activity, AlertTriangle, ArrowDown, ArrowUp, Bot, Building2, Wind,
   CheckCircle2, ChevronDown, ChevronRight, Globe2, Leaf, LogIn, UserRound,
@@ -11,8 +11,9 @@ import {
 } from "recharts";
 import "./App.css";
 import GoogleHotspotMap from "./components/GoogleHotspotMap";
+import GoogleIndustryMap from "./components/GoogleIndustryMap";
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = "https://brics-environmental-api-1071571669263.asia-south1.run.app";
 
 const CITIES = {
   Delhi: { country: "India", code: "IN", flag: "ðŸ‡®ðŸ‡³" },
@@ -1146,6 +1147,415 @@ function HotspotsPage({city}){
   );
 }
 
+
+function IndustriesPage({city}) {
+  const [prediction, setPrediction] = useState(null);
+  const [hotspotData, setHotspotData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const getErrorMessage = (value) => {
+    if (!value) {
+      return "Unable to load source intelligence.";
+    }
+
+    if (typeof value === "string") {
+      return value;
+    }
+
+    if (value instanceof Error) {
+      return value.message;
+    }
+
+    if (typeof value === "object") {
+      return (
+        value.message ||
+        value.detail ||
+        value.error ||
+        value.reason ||
+        (value.response && value.response.detail) ||
+        JSON.stringify(value)
+      );
+    }
+
+    return String(value);
+  };
+
+  const loadIndustryIntelligence = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const encodedCity = encodeURIComponent(city || "Delhi");
+
+      const response = await fetch(
+        `${API_BASE_URL}/hotspots/${encodedCity}`,
+        {
+          cache: "no-store"
+        }
+      );
+
+      const responseText = await response.text();
+
+      let payload = null;
+
+      try {
+        payload = responseText
+          ? JSON.parse(responseText)
+          : null;
+      } catch {
+        throw new Error(
+          `Hotspot API returned invalid JSON (HTTP ${response.status}).`
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          getErrorMessage(
+            payload?.detail ||
+            payload?.error ||
+            payload
+          )
+        );
+      }
+
+      const normalizedHotspots =
+        payload?.data ||
+        payload;
+
+      const normalizedPrediction =
+        normalizedHotspots?.model_prediction ||
+        null;
+
+      if (!normalizedPrediction || typeof normalizedPrediction !== "object") {
+        throw new Error("Prediction API returned an empty response.");
+      }
+
+      if (!normalizedHotspots || typeof normalizedHotspots !== "object") {
+        throw new Error("Hotspot API returned an empty response.");
+      }
+
+      setPrediction(normalizedPrediction);
+      setHotspotData(normalizedHotspots);
+
+    } catch (err) {
+      console.error("Industries intelligence error:", err);
+      setPrediction(null);
+      setHotspotData(null);
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (city) {
+      loadIndustryIntelligence();
+    }
+  }, [city]);
+
+  const hotspots = Array.isArray(hotspotData?.hotspots)
+    ? hotspotData.hotspots
+    : [];
+
+  const industrialHotspots = hotspots.filter(
+    (item) =>
+      String(item?.zone_type || "").toLowerCase() === "industrial"
+  );
+
+  const currentPm25 = Number(prediction?.current_pm25 ?? 0);
+  const predictedPm25 = Number(prediction?.predicted_pm25 ?? 0);
+
+  const trend =
+    prediction?.trend?.direction ||
+    prediction?.trend ||
+    "UNKNOWN";
+
+  const anomaly =
+    prediction?.anomaly?.status ||
+    prediction?.anomaly_status ||
+    "UNKNOWN";
+
+  const riskClass = (level) =>
+    `risk-pill ${String(level || "MONITORING")
+      .toLowerCase()
+      .replace(/\s+/g, "-")}`;
+
+  return (
+    <SimplePage
+      eyebrow="SOURCE INTELLIGENCE"
+      title="Industrial Source Intelligence"
+      description="Environmental source-risk intelligence for industrial areas identified from modelled hotspot evidence, atmospheric context and available citizen observations."
+      icon={<Building2 size={22}/>}
+    >
+      {loading ? (
+        <div className="empty-state">
+          <RefreshCw size={22} className="spin" />
+          <strong>Loading source intelligence...</strong>
+          <p>
+            Combining city prediction and multimodal hotspot evidence.
+          </p>
+        </div>
+      ) : error ? (
+        <div className="empty-state">
+          <AlertTriangle size={28} />
+          <h3>Source intelligence unavailable</h3>
+          <p>{error}</p>
+          <button
+            className="primary-button"
+            onClick={loadIndustryIntelligence}
+          >
+            <RefreshCw size={17} />
+            Retry
+          </button>
+        </div>
+      ) : (
+        <>
+          <div style={{ marginBottom: "18px" }}><GoogleIndustryMap city={city}/></div>
+
+          <div
+            className="sensor-banner"
+            style={{ marginBottom: "18px" }}
+          >
+            <span className="status-dot online-dot" />
+            <b>MODEL-BACKED SOURCE INTELLIGENCE</b>
+            <span>
+              Evidence is fused from prediction, hotspot and atmospheric
+              signals.
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4,minmax(0,1fr))",
+              gap: "12px",
+              marginBottom: "18px"
+            }}
+          >
+            <div className="sensor-card">
+              <span>Current PM2.5</span>
+              <strong>{currentPm25.toFixed(1)}</strong>
+              <small>µg/m³</small>
+            </div>
+
+            <div className="sensor-card">
+              <span>+6h Forecast</span>
+              <strong>{predictedPm25.toFixed(1)}</strong>
+              <small>µg/m³</small>
+            </div>
+
+            <div className="sensor-card">
+              <span>Forecast Trend</span>
+              <strong>{String(trend).toUpperCase()}</strong>
+              <small>Model forecast</small>
+            </div>
+
+            <div className="sensor-card">
+              <span>Anomaly Status</span>
+              <strong>{String(anomaly).toUpperCase()}</strong>
+              <small>Model signal</small>
+            </div>
+          </div>
+
+          <section className="v0-card">
+            <div className="v0-card-icon">
+              <Building2 size={22} />
+            </div>
+
+            <div className="v0-card-content">
+              <span className="v0-eyebrow">
+                INDUSTRIAL RISK AREAS
+              </span>
+
+              <h3>
+                {industrialHotspots.length} industrial area
+                {industrialHotspots.length === 1 ? "" : "s"} identified
+              </h3>
+
+              {industrialHotspots.length === 0 ? (
+                <div className="empty-state">
+                  <CheckCircle2 size={25} />
+                  <p>
+                    No industrial hotspot records are currently available
+                    for {city}.
+                  </p>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fit,minmax(280px,1fr))",
+                    gap: "14px",
+                    marginTop: "16px"
+                  }}
+                >
+                  {industrialHotspots.map((item, index) => {
+                    const fused = Number(
+                      item?.fused_hotspot_score ??
+                      item?.hotspot_score ??
+                      0
+                    );
+
+                    const modelScore = Number(
+                      item?.model_hotspot_score ??
+                      item?.hotspot_score ??
+                      0
+                    );
+
+                    const atmosphericScore = Number(
+                      item?.atmospheric_evidence_score ?? 0
+                    );
+
+                    const citizenReports = Number(
+                      item?.citizen_reports_nearby ?? 0
+                    );
+
+                    const level =
+                      item?.fused_level ||
+                      item?.hotspot_level ||
+                      "MONITORING";
+
+                    return (
+                      <article
+                        key={
+                          item?.name ||
+                          item?.id ||
+                          `industrial-${index}`
+                        }
+                        className="sensor-card"
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            gap: "10px"
+                          }}
+                        >
+                          <div>
+                            <span>Industrial area</span>
+                            <strong
+                              style={{
+                                display: "block",
+                                marginTop: "5px"
+                              }}
+                            >
+                              {item?.name || "Unnamed industrial area"}
+                            </strong>
+                          </div>
+
+                          <b className={riskClass(level)}>
+                            {String(level).toUpperCase()}
+                          </b>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              "repeat(2,minmax(0,1fr))",
+                            gap: "10px",
+                            marginTop: "16px"
+                          }}
+                        >
+                          <div>
+                            <small>Fused score</small>
+                            <strong>{fused.toFixed(1)}</strong>
+                          </div>
+
+                          <div>
+                            <small>Model score</small>
+                            <strong>{modelScore.toFixed(1)}</strong>
+                          </div>
+
+                          <div>
+                            <small>Atmospheric</small>
+                            <strong>
+                              {atmosphericScore.toFixed(1)}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <small>Citizen reports</small>
+                            <strong>{citizenReports}</strong>
+                          </div>
+                        </div>
+
+                        {item?.evidence_basis && (
+                          <p style={{ marginTop: "14px" }}>
+                            <b>Evidence basis:</b>{" "}
+                            {Array.isArray(item.evidence_basis)
+                              ? item.evidence_basis.join(", ")
+                              : String(item.evidence_basis)}
+                          </p>
+                        )}
+
+                        {item?.atmospheric_context && (
+                          <p>
+                            <b>Atmospheric context:</b>{" "}
+                            {typeof item.atmospheric_context ===
+                            "object"
+                              ? JSON.stringify(
+                                  item.atmospheric_context
+                                )
+                              : String(item.atmospheric_context)}
+                          </p>
+                        )}
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section
+            className="v0-card"
+            style={{ marginTop: "18px" }}
+          >
+            <div className="v0-card-icon">
+              <ShieldAlert size={22} />
+            </div>
+
+            <div className="v0-card-content">
+              <span className="v0-eyebrow">
+                EVIDENCE INTERPRETATION
+              </span>
+
+              <h3>How to interpret source-risk signals</h3>
+
+              <p>
+                Industrial areas are surfaced using modelled hotspot
+                evidence and supporting environmental signals. These
+                signals indicate where additional investigation or
+                monitoring may be useful.
+              </p>
+
+              <p>
+                They are <b>not causal source attribution</b> and do not
+                establish a regulatory violation by an individual
+                facility.
+              </p>
+            </div>
+          </section>
+
+          <div style={{ marginTop: "18px" }}>
+            <button
+              className="primary-button"
+              onClick={loadIndustryIntelligence}
+            >
+              <RefreshCw size={17} />
+              Refresh Intelligence
+            </button>
+          </div>
+        </>
+      )}
+    </SimplePage>
+  );
+}
+
 function ReportsPage({city}) {
   const [submitted, setSubmitted] = useState(false);
   const [location, setLocation] = useState("");
@@ -2046,6 +2456,206 @@ function AssistantPage() {
 
 function SettingsPage({theme,setTheme,language,setLanguage,t}){return <SimplePage eyebrow="PREFERENCES" title={t.settings} description="Customize the prototype for your preferred viewing experience." icon={<Settings size={22}/>}><div className="settings-row"><div><b>Appearance</b><span>Switch between dark and light environmental intelligence views.</span></div><button className="theme-switch" onClick={()=>setTheme(theme==="dark"?"light":"dark")}>{theme==="dark"?<Moon size={17}/>:<Sun size={17}/>} {theme==="dark"?"Dark":"Light"}</button></div><div className="settings-row"><div><b>Language</b><span>UI language for the current prototype.</span></div><select value={language} onChange={e=>setLanguage(e.target.value)}><option value="en">English</option><option value="hi">à¤¹à¤¿à¤¨à¥à¤¦à¥€</option><option value="od">à¬“à¬¡à¬¼à¬¿à¬†</option></select></div></SimplePage>}
 
+function SensorsPage({city}) {
+  const [sensorData, setSensorData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const CITY_COORDINATES = {
+    Delhi: {lat: 28.6139, lng: 77.2090},
+    Johannesburg: {lat: -26.2041, lng: 28.0473},
+    "Sao Paulo": {lat: -23.5505, lng: -46.6333},
+    Bhubaneswar: {lat: 20.2961, lng: 85.8245},
+  };
+
+  const loadSensorData = async () => {
+    const coords = CITY_COORDINATES[city] || CITY_COORDINATES.Delhi;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const params = new URLSearchParams({
+        city,
+        lat: String(coords.lat),
+        lng: String(coords.lng),
+        industry_name: `${city} monitoring network`,
+      });
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
+      const response = await fetch(
+        `/api/industry/environment?${params.toString()}`,
+        {signal: controller.signal}
+      );
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      setSensorData(await response.json());
+    } catch (err) {
+      setSensorData(null);
+      setError(
+        err.name === "AbortError"
+          ? "Public sensor request timed out."
+          : "Public sensor source is currently unavailable."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSensorData();
+  }, [city]);
+
+  const sensor = sensorData?.ambient_sensor || {};
+  const pollutants = sensor.pollutants || {};
+  const live = sensor.status === "LIVE_PUBLIC";
+
+  return (
+    <SimplePage
+      eyebrow="INDUSTRIAL SENSOR NETWORK"
+      title="Environmental Sensors"
+      description="Public environmental monitoring evidence is shown when available. No simulated value is presented as verified industrial telemetry."
+      icon={<Radio size={22}/>}
+    >
+      <div className="sensor-banner">
+        <span className={`status-dot ${live ? "online-dot" : ""}`} />
+
+        <b>
+          {loading
+            ? "CHECKING PUBLIC SENSORS"
+            : live
+              ? "LIVE PUBLIC SENSOR DATA"
+              : "PUBLIC SENSOR DATA UNAVAILABLE"}
+        </b>
+
+        <span>{city} monitoring network</span>
+
+        <button
+          onClick={loadSensorData}
+          disabled={loading}
+          style={{marginLeft:"auto"}}
+        >
+          {loading ? "Checking..." : "Refresh"}
+        </button>
+      </div>
+
+      {live ? (
+        <>
+          <div
+            style={{
+              marginBottom:"18px",
+              padding:"14px 16px",
+              border:"1px solid rgba(0,220,255,.2)",
+              borderRadius:"12px"
+            }}
+          >
+            <strong>
+              {sensor.station || "Public monitoring station"}
+            </strong>
+
+            <div style={{marginTop:"6px",fontSize:"12px",opacity:.72}}>
+              Source: {sensor.source || "CPCB / data.gov.in"} •{" "}
+              {sensor.distance_km ?? "—"} km from city reference point
+            </div>
+
+            {sensor.last_update && (
+              <div style={{marginTop:"4px",fontSize:"12px",opacity:.72}}>
+                Last update: {sensor.last_update}
+              </div>
+            )}
+          </div>
+
+          <div className="sensor-grid">
+            {Object.entries(pollutants).map(([name, data]) => (
+              <div className="sensor-card" key={name}>
+                <span>{name}</span>
+
+                <strong>
+                  {data.value} <small>{data.unit}</small>
+                </strong>
+
+                <b
+                  className={`sensor-status ${
+                    data.comparison === "ABOVE_REFERENCE"
+                      ? "high"
+                      : "normal"
+                  }`}
+                >
+                  {data.comparison === "ABOVE_REFERENCE"
+                    ? "ABOVE REFERENCE"
+                    : "WITHIN REFERENCE"}
+                </b>
+
+                {data.cpcb_reference != null && (
+                  <small style={{
+                    display:"block",
+                    marginTop:"8px",
+                    opacity:.65
+                  }}>
+                    Reference: {data.cpcb_reference} {data.unit}
+                  </small>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          <div style={{
+            padding:"16px",
+            marginBottom:"18px",
+            border:"1px solid rgba(255,180,0,.25)",
+            borderRadius:"12px"
+          }}>
+            <strong>Public source unavailable</strong>
+
+            <div style={{
+              marginTop:"6px",
+              fontSize:"12px",
+              opacity:.72
+            }}>
+              {error ||
+                sensorData?.reason ||
+                "No verified public sensor reading is available right now."}
+            </div>
+          </div>
+
+          <div style={{
+            marginBottom:"10px",
+            fontSize:"12px",
+            opacity:.6
+          }}>
+            DEMO FALLBACK — simulated values are shown only for interface
+            demonstration.
+          </div>
+
+          <div className="sensor-grid">
+            {SENSOR_DATA.map(([name,value,unit,status]) => (
+              <div className="sensor-card" key={name}>
+                <span>{name}</span>
+
+                <strong>
+                  {value} <small>{unit}</small>
+                </strong>
+
+                <b className={`sensor-status ${status.toLowerCase()}`}>
+                  DEMO {status}
+                </b>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </SimplePage>
+  );
+}
 function App(){
   const [loggedIn,setLoggedIn]=useState(()=>localStorage.getItem("brics_demo_login")==="1");
   const [route,navigate]=useHashRoute();
@@ -2118,8 +2728,8 @@ function App(){
 </option>)}</select><ChevronDown size={15}/></div><button className="icon-button" title="Toggle theme" onClick={()=>setTheme(theme==="dark"?"light":"dark")}>{theme==="dark"?<Sun size={18}/>:<Moon size={18}/>}</button><select className="language-select" value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option value="en">EN</option><option value="hi">à¤¹à¤¿</option><option value="od">à¬“</option></select><button className="refresh-button" onClick={refresh} disabled={refreshing}><RefreshCw size={17} className={refreshing?"spin":""}/>{t.refresh}</button></div></header>
       <main className="dashboard">
         {page==="dashboard"&&<Dashboard city={city} data={data} loading={loading} error={error} online={online} onRefresh={refresh} t={t}/>}
-        {page==="hotspots"&&<HotspotsPage city={city}/>} {page==="industries"&&<IndustriesPage/>}
-        {page==="reports"&&<ReportsPage/>} {page==="sensors"&&<SensorsPage/>}
+        {page==="hotspots"&&<HotspotsPage city={city}/>} {page==="industries"&&<IndustriesPage city={city}/>}
+        {page==="reports"&&<ReportsPage/>} {page==="sensors"&&<SensorsPage city={city}/>}
         {page==="assistant"&&<AssistantPage/>} {page==="network"&&<NetworkPage/>}
         {page==="settings"&&<SettingsPage theme={theme} setTheme={setTheme} language={language} setLanguage={setLanguage} t={t}/>}
       </main>
