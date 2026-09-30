@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "brics-hackathon-2026"
-  }
+  },
+  "targets": {
+    "brics-hackathon-2026": {
+      "hosting": {
+        "main": [
+          "brics-hackathon-2026"
+        ],
+        "vayunet": [
+          "vayunet"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

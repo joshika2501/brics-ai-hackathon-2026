@@ -42,6 +42,7 @@ app.add_middleware(
         "http://localhost:6380",
         "http://127.0.0.1:3000",
         "https://brics-hackathon-2026.web.app",
+	"https://vayunet.web.app",
     ],
     allow_credentials=False,
     allow_methods=["*"],
